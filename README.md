@@ -4,4 +4,5 @@ When golfing you want to keep track of the scoring you do for each course.  This
 
 # Favorite Quote
 Brady Burgener - "Believe you can and you're halfway there." — Theodore Roosevelt
+
 Brandon Mount - "You may delay, but time will not." -- Benjamin Franklin 
