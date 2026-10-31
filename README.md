@@ -6,3 +6,5 @@ When golfing you want to keep track of the scoring you do for each course.  This
 Brady Burgener - "Believe you can and you're halfway there." — Theodore Roosevelt
 
 Brandon Mount - "You may delay, but time will not." -- Benjamin Franklin 
+
+Michael Akpan - “Great things are done by a series of small things brought together.” — Vincent van Gogh
