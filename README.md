@@ -7,4 +7,6 @@ Brady Burgener - "Believe you can and you're halfway there." — Theodore Roosev
 
 Brandon Mount - "You may delay, but time will not." -- Benjamin Franklin 
 
-Garrett Peterson = "We have come from God, and inevitably the myths woven by us will also refelct a splintered fragment of the true light, the eternal truth that is with God" -- J.R.R. Tolkien
+Garrett Peterson - "We have come from God, and inevitably the myths woven by us will also refelct a splintered fragment of the true light, the eternal truth that is with God" -- J.R.R. Tolkien
+
+Michael Akpan - “Great things are done by a series of small things brought together.” — Vincent van Gogh
