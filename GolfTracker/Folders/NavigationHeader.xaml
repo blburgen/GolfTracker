@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="GolfTracker.Controls.NavigationHeader"
+    SizeChanged="Header_SizeChanged">
+
+    <Grid RowDefinitions="Auto,Auto"
+          BackgroundColor="{StaticResource PrimaryGreen}"
+          Padding="16,12">
+
+        <!-- Main header -->
+        <Grid Grid.Row="0"
+              ColumnDefinitions="Auto,*"
+              ColumnSpacing="20">
+
+            <Label
+                Grid.Column="0"
+                Text="GolfTracker"
+                TextColor="{StaticResource BackgroundWhite}"
+                FontSize="22"
+                FontAttributes="Bold"
+                VerticalOptions="Center" />
+
+            <!-- Desktop navigation -->
+            <HorizontalStackLayout
+                x:Name="DesktopNavigation"
+                Grid.Column="1"
+                Spacing="16"
+                HorizontalOptions="End"
+                VerticalOptions="Center"
+                IsVisible="False">
+
+                <!-- Welcome -->
+                <VerticalStackLayout Spacing="2">
+                    <Label
+                        x:Name="WelcomeDesktop"
+                        Text="Welcome"
+                        TextColor="{StaticResource BackgroundWhite}"
+                        Padding="8"
+                        VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <PointerGestureRecognizer
+                                PointerEntered="OnWelcomeHover"
+                                PointerExited="OnWelcomeExit" />
+                            <TapGestureRecognizer
+                                Tapped="OnNavigateTapped"
+                                CommandParameter="WelcomePage" />
+                        </Label.GestureRecognizers>
+                    </Label>
+
+                    <BoxView
+                        x:Name="WelcomeUnderline"
+                        Color="{StaticResource AccentGold}"
+                        HeightRequest="3"
+                        IsVisible="False" />
+                </VerticalStackLayout>
+
+                <!-- Sign In -->
+                <VerticalStackLayout Spacing="2">
+                    <Label
+                        x:Name="SignInDesktop"
+                        Text="Sign In"
+                        TextColor="{StaticResource BackgroundWhite}"
+                        Padding="8"
+                        VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <PointerGestureRecognizer
+                                PointerEntered="OnSignInHover"
+                                PointerExited="OnSignInExit" />
+                            <TapGestureRecognizer
+                                Tapped="OnNavigateTapped"
+                                CommandParameter="SignIn" />
+                        </Label.GestureRecognizers>
+                    </Label>
+
+                    <BoxView
+                        x:Name="SignInUnderline"
+                        Color="{StaticResource AccentGold}"
+                        HeightRequest="3"
+                        IsVisible="False" />
+                </VerticalStackLayout>
+
+                <!-- New Game -->
+                <VerticalStackLayout Spacing="2">
+                    <Label
+                        x:Name="NewGameDesktop"
+                        Text="New Game"
+                        TextColor="{StaticResource BackgroundWhite}"
+                        Padding="8"
+                        VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <PointerGestureRecognizer
+                                PointerEntered="OnNewGameHover"
+                                PointerExited="OnNewGameExit" />
+                            <TapGestureRecognizer
+                                Tapped="OnNavigateTapped"
+                                CommandParameter="NewGame" />
+                        </Label.GestureRecognizers>
+                    </Label>
+
+                    <BoxView
+                        x:Name="NewGameUnderline"
+                        Color="{StaticResource AccentGold}"
+                        HeightRequest="3"
+                        IsVisible="False" />
+                </VerticalStackLayout>
+
+                <!-- History -->
+                <VerticalStackLayout Spacing="2">
+                    <Label
+                        x:Name="HistoryDesktop"
+                        Text="History"
+                        TextColor="{StaticResource BackgroundWhite}"
+                        Padding="8"
+                        VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <PointerGestureRecognizer
+                                PointerEntered="OnHistoryHover"
+                                PointerExited="OnHistoryExit" />
+                            <TapGestureRecognizer
+                                Tapped="OnNavigateTapped"
+                                CommandParameter="History" />
+                        </Label.GestureRecognizers>
+                    </Label>
+
+                    <BoxView
+                        x:Name="HistoryUnderline"
+                        Color="{StaticResource AccentGold}"
+                        HeightRequest="3"
+                        IsVisible="False" />
+                </VerticalStackLayout>
+
+            </HorizontalStackLayout>
+
+            <!-- Mobile hamburger -->
+            <Button
+                x:Name="MobileMenuButton"
+                Grid.Column="1"
+                Text="☰"
+                FontSize="24"
+                TextColor="{StaticResource BackgroundWhite}"
+                BackgroundColor="Transparent"
+                HorizontalOptions="End"
+                Clicked="OnMenuClicked" />
+
+        </Grid>
+
+        <!-- Mobile navigation -->
+        <VerticalStackLayout
+            x:Name="MobileMenu"
+            Grid.Row="1"
+            Spacing="8"
+            Padding="0,12,0,0"
+            IsVisible="False">
+
+            <Label
+                Text="Welcome"
+                x:Name="WelcomeMobile"
+                TextColor="{StaticResource BackgroundWhite}"
+                Padding="12"
+                MinimumHeightRequest="44">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer
+                        Tapped="OnNavigateTapped"
+                        CommandParameter="WelcomePage" />
+                </Label.GestureRecognizers>
+            </Label>
+
+            <Label
+                Text="Sign In"
+                x:Name="SignInMobile"
+                TextColor="{StaticResource BackgroundWhite}"
+                Padding="12"
+                MinimumHeightRequest="44">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer
+                        Tapped="OnNavigateTapped"
+                        CommandParameter="SignIn" />
+                </Label.GestureRecognizers>
+            </Label>
+
+            <Label
+                Text="New Game"
+                x:Name="NewGameMobile"
+                TextColor="{StaticResource BackgroundWhite}"
+                Padding="12"
+                MinimumHeightRequest="44">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer
+                        Tapped="OnNavigateTapped"
+                        CommandParameter="NewGame" />
+                </Label.GestureRecognizers>
+            </Label>
+
+            <Label
+                Text="History"
+                x:Name="HistoryMobile"
+                TextColor="{StaticResource BackgroundWhite}"
+                Padding="12"
+                MinimumHeightRequest="44">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer
+                        Tapped="OnNavigateTapped"
+                        CommandParameter="History" />
+                </Label.GestureRecognizers>
+            </Label>
+
+        </VerticalStackLayout>
+
+    </Grid>
+</ContentView>

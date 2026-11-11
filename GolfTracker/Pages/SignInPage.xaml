@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:GolfTracker.Controls"
+    x:Class="GolfTracker.Pages.SignIn"
+    Title="SignIn"
+    BackgroundColor="{StaticResource BackgroundWhite}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Shared navigation header -->
+        <controls:NavigationHeader
+            Grid.Row="0" />
+
+        <!-- SignIn page content -->
+        <ScrollView Grid.Row="1">
+
+            <VerticalStackLayout
+                Padding="24"
+                Spacing="20"
+                VerticalOptions="Center">
+
+                <Label
+                    Text="Sign In Tab Placeholder"
+                    FontSize="28"
+                    FontAttributes="Bold"
+                    TextColor="{StaticResource PrimaryGreen}"
+                    HorizontalTextAlignment="Center" />
+
+            </VerticalStackLayout>
+
+        </ScrollView>
+
+    </Grid>
+
+</ContentPage>

@@ -3,12 +3,29 @@
     x:Class="GolfTracker.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:GolfTracker"
-    Title="GolfTracker">
+    xmlns:pages="clr-namespace:GolfTracker.Pages"
+    Title="GolfTracker"
+    FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="False">
 
     <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        Title="Welcome"
+        ContentTemplate="{DataTemplate pages:WelcomePage}"
+        Route="WelcomePage" />
+
+    <ShellContent
+        Title="Sign In"
+        ContentTemplate="{DataTemplate pages:SignIn}"
+        Route="SignIn" />
+
+    <ShellContent
+        Title="New Game"
+        ContentTemplate="{DataTemplate pages:NewGame}"
+        Route="NewGame" />
+
+    <ShellContent
+        Title="History"
+        ContentTemplate="{DataTemplate pages:History}"
+        Route="History" />
 
 </Shell>
