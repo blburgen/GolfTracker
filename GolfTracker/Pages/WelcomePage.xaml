@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:GolfTracker.Controls"
+    x:Class="GolfTracker.Pages.WelcomePage"
+    Title="Welcome"
+    BackgroundColor="{StaticResource BackgroundWhite}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Shared navigation header -->
+        <controls:NavigationHeader
+            Grid.Row="0" />
+
+        <!-- Welcome page content -->
+        <ScrollView
+            Grid.Row="1"
+            BackgroundColor="{StaticResource BackgroundWhite}">
+
+            <VerticalStackLayout
+                Padding="24"
+                Spacing="20"
+                VerticalOptions="Center">
+
+                <!-- Main heading -->
+                <Label
+                    Text="Welcome to GolfTracker!"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    TextColor="{StaticResource PrimaryGreen}"
+                    HorizontalTextAlignment="Center" />
+
+                <!-- Subtitle -->
+                <Label
+                    Text="Track your golf games and scores."
+                    FontSize="16"
+                    TextColor="{StaticResource TextMuted}"
+                    HorizontalTextAlignment="Center" />
+
+                <!-- Decorative accent -->
+                <BoxView
+                    Color="{StaticResource AccentGold}"
+                    WidthRequest="60"
+                    HeightRequest="3"
+                    HorizontalOptions="Center" />
+
+            </VerticalStackLayout>
+
+        </ScrollView>
+
+    </Grid>
+
+</ContentPage>
