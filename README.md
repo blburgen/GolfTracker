@@ -10,3 +10,8 @@ Brandon Mount - "You may delay, but time will not." -- Benjamin Franklin
 Garrett Peterson - "We have come from God, and inevitably the myths woven by us will also refelct a splintered fragment of the true light, the eternal truth that is with God" -- J.R.R. Tolkien
 
 Michael Akpan - “Great things are done by a series of small things brought together.” — Vincent van Gogh
+
+
+# To Test Locally in terminal
+1. go into GolfTracker folder
+2. dotnet run -f net10.0-windows10.0.19041.0 -p:TargetFrameworks=net10.0-windows10.0.19041.0
