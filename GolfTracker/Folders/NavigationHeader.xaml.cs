@@ -3,7 +3,7 @@ namespace GolfTracker.Controls;
 
 public partial class NavigationHeader : ContentView
 {
-    private const double DesktopBreakpoint = 700;
+    private const double DesktopBreakpoint = 800;
 
     private static readonly Color HoverColor =
         Color.FromArgb("#86EFAC");
