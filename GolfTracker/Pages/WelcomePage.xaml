@@ -5,45 +5,213 @@
     xmlns:controls="clr-namespace:GolfTracker.Controls"
     x:Class="GolfTracker.Pages.WelcomePage"
     Title="Welcome"
-    BackgroundColor="{StaticResource BackgroundWhite}">
+    BackgroundColor="{StaticResource BackgroundWhite}"
+    SizeChanged="OnPageSizeChanged">
 
+    <!-- Main layout -->
     <Grid RowDefinitions="Auto,*">
 
-        <!-- Shared navigation header -->
+        <!-- Row 0: Navigation header -->
         <controls:NavigationHeader
             Grid.Row="0" />
 
-        <!-- Welcome page content -->
-        <ScrollView
-            Grid.Row="1"
-            BackgroundColor="{StaticResource BackgroundWhite}">
+        <!-- Row 1: Scrollable page content -->
+        <ScrollView Grid.Row="1">
 
-            <VerticalStackLayout
-                Padding="24"
-                Spacing="20"
-                VerticalOptions="Center">
+            <VerticalStackLayout Spacing="30">
 
-                <!-- Main heading -->
-                <Label
-                    Text="Welcome to GolfTracker!"
-                    FontSize="32"
-                    FontAttributes="Bold"
-                    TextColor="{StaticResource PrimaryGreen}"
-                    HorizontalTextAlignment="Center" />
+                <!-- Welcome section -->
+                <Grid
+                    x:Name="WelcomeGrid"
+                    ColumnDefinitions="*,*"
+                    ColumnSpacing="20"
+                    MinimumHeightRequest="450"
+                    Padding="20">
 
-                <!-- Subtitle -->
-                <Label
-                    Text="Track your golf games and scores."
-                    FontSize="16"
-                    TextColor="{StaticResource TextMuted}"
-                    HorizontalTextAlignment="Center" />
+                    <!-- Left column: Welcome text and buttons -->
+                    <VerticalStackLayout
+                        x:Name="WelcomeText"
+                        Grid.Column="0"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"
+                        Spacing="15">
 
-                <!-- Decorative accent -->
-                <BoxView
-                    Color="{StaticResource AccentGold}"
-                    WidthRequest="60"
-                    HeightRequest="3"
-                    HorizontalOptions="Center" />
+                        <Label
+                            Text="Your Golf Tracker"
+                            FontSize="18"
+                            TextColor="{StaticResource PrimaryGreen}"
+                            HorizontalTextAlignment="Start"
+                            VerticalOptions="Center" />
+
+                        <Label
+                            Text="Every Round Counts"
+                            FontSize="28"
+                            FontAttributes="Bold"
+                            TextColor="{StaticResource PrimaryGreen}"
+                            HorizontalTextAlignment="Start"
+                            VerticalOptions="Center" />
+
+                        <Label
+                            Text="Track your scores, follow your progress, and keep your golf history in one place"
+                            FontSize="18"
+                            TextColor="{StaticResource PrimaryGreen}"
+                            HorizontalTextAlignment="Start"
+                            VerticalOptions="Center" />
+
+                        <Button
+                            Text="New Game"
+                            MaximumWidthRequest="300"
+                            BackgroundColor="{StaticResource PrimaryGreen}"
+                            TextColor="White"
+                            CornerRadius="10"
+                            Padding="20,12"
+                            HorizontalOptions="Fill"
+                            Clicked="OnNewGameClicked" />
+
+                        <Button
+                            Text="Sign In"
+                            MaximumWidthRequest="300"
+                            BackgroundColor="White"
+                            TextColor="{StaticResource PrimaryGreen}"
+                            BorderColor="{StaticResource PrimaryGreen}"
+                            BorderWidth="2"
+                            CornerRadius="10"
+                            Padding="20,12"
+                            HorizontalOptions="Fill"
+                            Clicked="OnSignInClicked" />
+
+                    </VerticalStackLayout>
+
+                    <!-- Right column: Golf course image -->
+                    <Border
+                        x:Name="WelcomeImage"
+                        Grid.Column="1"
+                        Margin="20"
+                        Padding="0"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 20"
+                        VerticalOptions="Fill"
+                        HorizontalOptions="Fill">
+
+                        <Image
+                            Source="golf_course.jpg"
+                            Aspect="AspectFill"
+                            HorizontalOptions="Fill"
+                            VerticalOptions="Fill" />
+
+                    </Border>
+
+                </Grid>
+
+                <!-- Second section: Full width -->
+                
+                <Grid
+                    x:Name="FeaturesGrid"
+                    RowDefinitions="Auto,*,Auto"
+                    ColumnDefinitions="*,*,*"
+                    Padding="0,15"
+                    Margin="40,20">
+
+                    <!-- Top border across all three columns -->
+                    <BoxView
+                        x:Name="TopDivider"
+                        Grid.Row="0"
+                        Grid.ColumnSpan="3"
+                        HeightRequest="2"
+                        Color="{StaticResource AccentGold}" />
+
+                    <VerticalStackLayout
+                        x:Name="RecordSection"
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"
+                        Padding="0,40"
+                        Spacing="5">
+
+                        <Image
+                            Source="track.png"
+                            HeightRequest="28"
+                            WidthRequest="28"
+                            HorizontalOptions="Center" />
+
+                        <Label
+                            Text="Record"
+                            HorizontalTextAlignment="Center"
+                            FontSize="16"
+                            TextColor="{StaticResource PrimaryGreen}" />
+                        <Label
+                            Text="Log Your Rounds"
+                            HorizontalTextAlignment="Center"
+                            FontSize="12"
+                            TextColor="{StaticResource PrimaryGreen}" />
+
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout
+                        x:Name="ImproveSection"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"
+                        Padding="0,40"
+                        Spacing="5">
+
+                        <Image
+                            Source="improve.png"
+                            HeightRequest="28"
+                            WidthRequest="28"
+                            HorizontalOptions="Center" />
+
+                        <Label
+                            Text="Improve"
+                            HorizontalTextAlignment="Center"
+                            FontSize="16"
+                            TextColor="{StaticResource PrimaryGreen}" />
+                        <Label
+                            Text="Follow Progress"
+                            HorizontalTextAlignment="Center"
+                            FontSize="12"
+                            TextColor="{StaticResource PrimaryGreen}" />
+
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout
+                        x:Name="HistorySection"
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"
+                        Padding="0,40"
+                        Spacing="5">
+
+                        <Image
+                            Source="history.png"
+                            HeightRequest="28"
+                            WidthRequest="28"
+                            HorizontalOptions="Center" />
+
+                        <Label
+                            Text="History"
+                            HorizontalTextAlignment="Center"
+                            FontSize="16"
+                            TextColor="{StaticResource PrimaryGreen}" />
+                        <Label
+                            Text="Sign in to save scores"
+                            HorizontalTextAlignment="Center"
+                            FontSize="12"
+                            TextColor="{StaticResource PrimaryGreen}" />
+
+                    </VerticalStackLayout>
+
+                    <!-- Bottom border across all three columns -->
+                    <BoxView
+                        x:Name="BottomDivider"
+                        Grid.Row="2"
+                        Grid.ColumnSpan="3"
+                        HeightRequest="2"
+                        Color="{StaticResource AccentGold}" />
+                </Grid>
 
             </VerticalStackLayout>
 
