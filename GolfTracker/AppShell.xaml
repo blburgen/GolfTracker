@@ -24,6 +24,11 @@
         Route="NewGame" />
 
     <ShellContent
+        Title="Scorecard"
+        ContentTemplate="{DataTemplate pages:Scorecard}"
+        Route="Scorecard" />
+
+    <ShellContent
         Title="History"
         ContentTemplate="{DataTemplate pages:History}"
         Route="History" />

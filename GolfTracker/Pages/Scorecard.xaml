@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:GolfTracker.Controls"
+    x:Class="GolfTracker.Pages.Scorecard"
+    Title="Scorecard"
+    BackgroundColor="{StaticResource BackgroundWhite}"
+    SizeChanged="OnPageSizeChanged">
+
+    <Grid RowDefinitions="Auto,*">
+        <controls:NavigationHeader Grid.Row="0" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="5">
+
+                <!-- DESKTOP SCORECARD -->
+                <VerticalStackLayout x:Name="DesktopScorecard"
+                                     IsVisible="False"
+                                     Padding="30"
+                                     Spacing="20">
+                    <Border BackgroundColor="{StaticResource BackgroundSoft}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 20"
+                            Padding="25">
+                        <VerticalStackLayout Spacing="8">
+                            <Label x:Name="DesktopRoundDateAndType"
+                                   FontSize="16" TextColor="{StaticResource TextMuted}" />
+                            <Label x:Name="DesktopCourseName"
+                                   FontSize="30" FontAttributes="Bold"
+                                   TextColor="{StaticResource PrimaryGreen}" />
+                            <Label x:Name="DesktopRoundHoleCount"
+                                   FontSize="16" TextColor="{StaticResource TextDark}" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Grid ColumnDefinitions="1.4*,*" ColumnSpacing="20">
+                        <Border Grid.Column="0"
+                                BackgroundColor="{StaticResource BackgroundWhite}"
+                                Stroke="#DFE8DE" StrokeThickness="1"
+                                StrokeShape="RoundRectangle 20" Padding="20">
+                            <VerticalStackLayout Spacing="15">
+                                <Label Text="Course Scorecard" FontSize="24"
+                                       FontAttributes="Bold" TextColor="{StaticResource PrimaryGreen}" />
+                                <Label Text="Select any hole to enter or edit its score."
+                                       FontSize="14" TextColor="{StaticResource TextMuted}" />
+                                <Grid ColumnDefinitions="90,*,*,*" ColumnSpacing="8" Padding="8">
+                                    <Label Grid.Column="0" Text="Hole" FontAttributes="Bold"
+                                           TextColor="{StaticResource PrimaryGreen}" />
+                                    <Label Grid.Column="1" Text="Par" FontAttributes="Bold"
+                                           HorizontalTextAlignment="Center"
+                                           TextColor="{StaticResource PrimaryGreen}" />
+                                    <Label Grid.Column="2" Text="Strokes" FontAttributes="Bold"
+                                           HorizontalTextAlignment="Center"
+                                           TextColor="{StaticResource PrimaryGreen}" />
+                                    <Label Grid.Column="3" Text="Result" FontAttributes="Bold"
+                                           HorizontalTextAlignment="Center"
+                                           TextColor="{StaticResource PrimaryGreen}" />
+                                </Grid>
+                                <BoxView HeightRequest="1" Color="#DFE8DE" />
+                                <VerticalStackLayout x:Name="DesktopHoleRows" Spacing="5" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <VerticalStackLayout Grid.Column="1" Spacing="20">
+                            <Border BackgroundColor="{StaticResource BackgroundWhite}"
+                                    Stroke="#DFE8DE" StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 20" Padding="20">
+                                <VerticalStackLayout Spacing="20">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label x:Name="DesktopCurrentHoleLabel" Grid.Column="0"
+                                               Text="Hole 1" FontSize="24" FontAttributes="Bold"
+                                               VerticalOptions="Center"
+                                               TextColor="{StaticResource PrimaryGreen}" />
+                                        <Border x:Name="DesktopCurrentParBorder" Grid.Column="1"
+                                                IsVisible="False" StrokeThickness="0"
+                                                StrokeShape="RoundRectangle 12"
+                                                BackgroundColor="{StaticResource BackgroundSoft}"
+                                                Padding="10,6">
+                                            <Label x:Name="DesktopCurrentParLabel" Text="Par 4"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{StaticResource PrimaryGreen}" />
+                                        </Border>
+                                    </Grid>
+                                    <Border BackgroundColor="{StaticResource BackgroundSoft}"
+                                            StrokeThickness="0" StrokeShape="RoundRectangle 20"
+                                            Padding="20">
+                                        <VerticalStackLayout Spacing="15">
+                                            <Label Text="Strokes This Hole" FontSize="18"
+                                                   HorizontalTextAlignment="Center"
+                                                   TextColor="{StaticResource TextMuted}" />
+                                            <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="10">
+                                                <Button x:Name="DesktopDecreaseStrokesButton"
+                                                        Grid.Column="0" Text="−" FontSize="26"
+                                                        WidthRequest="55" HeightRequest="55" CornerRadius="28"
+                                                        HorizontalOptions="End"
+                                                        BackgroundColor="{StaticResource BackgroundWhite}"
+                                                        TextColor="{StaticResource PrimaryGreen}"
+                                                        BorderColor="{StaticResource PrimaryGreen}" BorderWidth="1"
+                                                        Clicked="OnDecreaseStrokesClicked" />
+                                                <Label x:Name="DesktopCurrentStrokesLabel" Grid.Column="1"
+                                                       Text="—" FontSize="44" FontAttributes="Bold"
+                                                       MinimumWidthRequest="55" HorizontalTextAlignment="Center"
+                                                       VerticalTextAlignment="Center"
+                                                       TextColor="{StaticResource PrimaryGreen}" />
+                                                <Button Grid.Column="2" Text="+" FontSize="26"
+                                                        WidthRequest="55" HeightRequest="55" CornerRadius="28"
+                                                        HorizontalOptions="Start"
+                                                        BackgroundColor="{StaticResource PrimaryGreen}"
+                                                        TextColor="White" Clicked="OnIncreaseStrokesClicked" />
+                                            </Grid>
+                                            <Label x:Name="DesktopHoleResultLabel" IsVisible="False"
+                                                   HorizontalTextAlignment="Center"
+                                                   TextColor="{StaticResource TextMuted}" />
+                                        </VerticalStackLayout>
+                                    </Border>
+                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                        <Button x:Name="DesktopPreviousHoleButton" Grid.Column="0"
+                                                Text="Previous"
+                                                BackgroundColor="{StaticResource BackgroundSoft}"
+                                                TextColor="{StaticResource PrimaryGreen}"
+                                                CornerRadius="12" Clicked="OnPreviousHoleClicked" />
+                                        <Button x:Name="DesktopNextHoleButton" Grid.Column="1"
+                                                Text="Next Hole"
+                                                BackgroundColor="{StaticResource PrimaryGreen}"
+                                                TextColor="White" CornerRadius="12"
+                                                Clicked="OnNextHoleClicked" />
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border BackgroundColor="{StaticResource BackgroundSoft}"
+                                    StrokeThickness="0" StrokeShape="RoundRectangle 20"
+                                    Padding="20">
+                                <VerticalStackLayout Spacing="15">
+                                    <Label Text="Round Summary" FontSize="22" FontAttributes="Bold"
+                                           TextColor="{StaticResource PrimaryGreen}" />
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Text="Total Strokes"
+                                               TextColor="{StaticResource TextDark}" />
+                                        <Label x:Name="DesktopTotalStrokesLabel" Grid.Column="1"
+                                               Text="0" FontAttributes="Bold"
+                                               TextColor="{StaticResource PrimaryGreen}" />
+                                    </Grid>
+                                    <BoxView HeightRequest="1" Color="#DFE8DE" />
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Text="Holes Completed"
+                                               TextColor="{StaticResource TextDark}" />
+                                        <Label x:Name="DesktopHolesCompletedLabel" Grid.Column="1"
+                                               Text="0 / 18" FontAttributes="Bold"
+                                               TextColor="{StaticResource PrimaryGreen}" />
+                                    </Grid>
+                                    <Grid x:Name="DesktopRelativeToParSection"
+                                          ColumnDefinitions="*,Auto" IsVisible="False">
+                                        <Label Text="Relative to Par"
+                                               TextColor="{StaticResource TextDark}" />
+                                        <Label x:Name="DesktopRelativeToParLabel" Grid.Column="1"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource PrimaryGreen}" />
+                                    </Grid>
+                                    <Button x:Name="DesktopFinishRoundButton" Text="Finish Round"
+                                            BackgroundColor="{StaticResource PrimaryGreen}"
+                                            TextColor="White" CornerRadius="12" Padding="15"
+                                            Clicked="OnFinishRoundClicked" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </VerticalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+
+                <!-- MOBILE SCORECARD -->
+                <Grid x:Name="MobileScorecard"
+                      RowDefinitions="Auto,Auto,Auto" RowSpacing="20"
+                      Padding="20" MaximumWidthRequest="650"
+                      HorizontalOptions="Fill">
+                    <Border Grid.Row="0" BackgroundColor="{StaticResource BackgroundSoft}"
+                            StrokeThickness="0" StrokeShape="RoundRectangle 20" Padding="20">
+                        <VerticalStackLayout Spacing="10">
+                            <Label x:Name="RoundDateAndType" FontSize="14"
+                                   TextColor="{StaticResource TextMuted}" />
+                            <Label x:Name="CourseName" FontSize="26" FontAttributes="Bold"
+                                   TextColor="{StaticResource PrimaryGreen}" />
+                            <Label x:Name="RoundHoleCount" FontSize="16"
+                                   TextColor="{StaticResource TextDark}" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="1" BackgroundColor="{StaticResource BackgroundWhite}"
+                            Stroke="#DFE8DE" StrokeThickness="1"
+                            StrokeShape="RoundRectangle 20" Padding="20">
+                        <VerticalStackLayout Spacing="25">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label x:Name="CurrentHoleLabel" Grid.Column="0"
+                                       Text="Hole 1" FontSize="25" FontAttributes="Bold"
+                                       VerticalOptions="Center"
+                                       TextColor="{StaticResource PrimaryGreen}" />
+                                <Border x:Name="CurrentParBorder" Grid.Column="1"
+                                        IsVisible="False" StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 12" Padding="12,8"
+                                        BackgroundColor="{StaticResource BackgroundSoft}">
+                                    <Label x:Name="CurrentParLabel" Text="Par 4" FontSize="15"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource PrimaryGreen}" />
+                                </Border>
+                            </Grid>
+                            <Border BackgroundColor="{StaticResource BackgroundSoft}"
+                                    StrokeThickness="0" StrokeShape="RoundRectangle 20"
+                                    Padding="20">
+                                <VerticalStackLayout Spacing="20">
+                                    <Label Text="Strokes This Hole" FontSize="18"
+                                           HorizontalTextAlignment="Center"
+                                           TextColor="{StaticResource TextMuted}" />
+                                    <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="10">
+                                        <Button x:Name="DecreaseStrokesButton" Grid.Column="0"
+                                                Text="−" FontSize="28" WidthRequest="60"
+                                                HeightRequest="60" CornerRadius="30"
+                                                HorizontalOptions="End"
+                                                BackgroundColor="{StaticResource BackgroundWhite}"
+                                                TextColor="{StaticResource PrimaryGreen}"
+                                                BorderColor="{StaticResource PrimaryGreen}" BorderWidth="1"
+                                                Clicked="OnDecreaseStrokesClicked" />
+                                        <Label x:Name="CurrentStrokesLabel" Grid.Column="1"
+                                               Text="—" FontSize="52" FontAttributes="Bold"
+                                               MinimumWidthRequest="65"
+                                               HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+                                               TextColor="{StaticResource PrimaryGreen}" />
+                                        <Button Grid.Column="2" Text="+" FontSize="28"
+                                                WidthRequest="60" HeightRequest="60" CornerRadius="30"
+                                                HorizontalOptions="Start"
+                                                BackgroundColor="{StaticResource PrimaryGreen}"
+                                                TextColor="White" Clicked="OnIncreaseStrokesClicked" />
+                                    </Grid>
+                                    <Label x:Name="HoleResultLabel" IsVisible="False" FontSize="15"
+                                           HorizontalTextAlignment="Center"
+                                           TextColor="{StaticResource TextMuted}" />
+                                </VerticalStackLayout>
+                            </Border>
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <Button x:Name="PreviousHoleButton" Grid.Column="0"
+                                        Text="Previous Hole"
+                                        BackgroundColor="{StaticResource BackgroundSoft}"
+                                        TextColor="{StaticResource PrimaryGreen}"
+                                        CornerRadius="12" Padding="10,15"
+                                        Clicked="OnPreviousHoleClicked" />
+                                <Button x:Name="NextHoleButton" Grid.Column="1"
+                                        Text="Next Hole" BackgroundColor="{StaticResource PrimaryGreen}"
+                                        TextColor="White" CornerRadius="12" Padding="10,15"
+                                        Clicked="OnNextHoleClicked" />
+                            </Grid>
+                            <Button x:Name="FinishRoundButton" Text="Finish Round"
+                                    IsVisible="False"
+                                    BackgroundColor="{StaticResource PrimaryGreen}"
+                                    TextColor="White" CornerRadius="12" Padding="15"
+                                    Clicked="OnFinishRoundClicked" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="2" BackgroundColor="{StaticResource BackgroundSoft}"
+                            StrokeThickness="0" StrokeShape="RoundRectangle 20"
+                            Padding="20">
+                        <VerticalStackLayout Spacing="15">
+                            <Label Text="Round Summary" FontSize="22" FontAttributes="Bold"
+                                   TextColor="{StaticResource PrimaryGreen}" />
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="Total Strokes" FontSize="16"
+                                       TextColor="{StaticResource TextDark}" />
+                                <Label x:Name="TotalStrokesLabel" Grid.Column="1" Text="0"
+                                       FontSize="18" FontAttributes="Bold"
+                                       TextColor="{StaticResource PrimaryGreen}" />
+                            </Grid>
+                            <BoxView HeightRequest="1" Color="#DFE8DE" />
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="Holes Completed" FontSize="16"
+                                       TextColor="{StaticResource TextDark}" />
+                                <Label x:Name="HolesCompletedLabel" Grid.Column="1"
+                                       Text="0 / 18" FontSize="18" FontAttributes="Bold"
+                                       TextColor="{StaticResource PrimaryGreen}" />
+                            </Grid>
+                            <Grid x:Name="RelativeToParSection" ColumnDefinitions="*,Auto"
+                                  IsVisible="False">
+                                <Label Text="Relative to Par" FontSize="16"
+                                       TextColor="{StaticResource TextDark}" />
+                                <Label x:Name="RelativeToParLabel" Grid.Column="1"
+                                       FontSize="18" FontAttributes="Bold"
+                                       TextColor="{StaticResource PrimaryGreen}" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Shared modal-style completion overlay for mobile and desktop. -->
+        <Grid x:Name="RoundCompleteOverlay"
+              Grid.RowSpan="2"
+              ZIndex="10"
+              IsVisible="False"
+              BackgroundColor="#99000000"
+              Padding="16">
+            <Border MaximumWidthRequest="460"
+                    MaximumHeightRequest="650"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    BackgroundColor="{StaticResource BackgroundWhite}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 24"
+                    Padding="0">
+                <ScrollView>
+                    <VerticalStackLayout Padding="24" Spacing="18">
+                        <Border BackgroundColor="{StaticResource BackgroundSoft}"
+                                StrokeThickness="0" StrokeShape="RoundRectangle 40"
+                                WidthRequest="70" HeightRequest="70"
+                                HorizontalOptions="Center">
+                            <Label Text="⛳" FontSize="34"
+                                   HorizontalTextAlignment="Center"
+                                   VerticalTextAlignment="Center" />
+                        </Border>
+                        <Label Text="Round Complete!"
+                               FontSize="28" FontAttributes="Bold"
+                               HorizontalTextAlignment="Center"
+                               TextColor="{StaticResource PrimaryGreen}" />
+                        <Label Text="Here's how you did."
+                               HorizontalTextAlignment="Center" FontSize="15"
+                               TextColor="{StaticResource TextMuted}" />
+                        <BoxView HeightRequest="1" Color="#DFE8DE" />
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="COURSE" FontSize="12"
+                                   HorizontalTextAlignment="Center"
+                                   TextColor="{StaticResource TextMuted}" />
+                            <Label x:Name="FinalCourseLabel" FontSize="20"
+                                   FontAttributes="Bold" HorizontalTextAlignment="Center"
+                                   TextColor="{StaticResource PrimaryGreen}" />
+                            <Label x:Name="FinalDetailsLabel" FontSize="13"
+                                   HorizontalTextAlignment="Center"
+                                   TextColor="{StaticResource TextMuted}" />
+                        </VerticalStackLayout>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                            <Border Grid.Column="0" BackgroundColor="{StaticResource BackgroundSoft}"
+                                    StrokeThickness="0" StrokeShape="RoundRectangle 14"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="TOTAL STROKES" FontSize="11"
+                                           HorizontalTextAlignment="Center"
+                                           TextColor="{StaticResource TextMuted}" />
+                                    <Label x:Name="FinalStrokesLabel" FontSize="32"
+                                           FontAttributes="Bold" HorizontalTextAlignment="Center"
+                                           TextColor="{StaticResource PrimaryGreen}" />
+                                </VerticalStackLayout>
+                            </Border>
+                            <Border x:Name="FinalParCard" Grid.Column="1"
+                                    IsVisible="False"
+                                    BackgroundColor="{StaticResource BackgroundSoft}"
+                                    StrokeThickness="0" StrokeShape="RoundRectangle 14"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="RELATIVE TO PAR" FontSize="11"
+                                           HorizontalTextAlignment="Center"
+                                           TextColor="{StaticResource TextMuted}" />
+                                    <Label x:Name="FinalParLabel" FontSize="32"
+                                           FontAttributes="Bold" HorizontalTextAlignment="Center"
+                                           TextColor="{StaticResource PrimaryGreen}" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
+                        <Label x:Name="FinalHoleCountLabel" FontSize="14"
+                               HorizontalTextAlignment="Center"
+                               TextColor="{StaticResource TextMuted}" />
+                        <Label Text="Sign in to save this round to your history."
+                               FontSize="13" HorizontalTextAlignment="Center"
+                               TextColor="{StaticResource TextMuted}" />
+                        <BoxView HeightRequest="1" Color="#DFE8DE" />
+                        <Button Text="Sign In to Save"
+                                BackgroundColor="{StaticResource PrimaryGreen}"
+                                TextColor="White" CornerRadius="12" Padding="14"
+                                Clicked="OnSignInToSaveClicked" />
+                        <Button Text="Start New Round"
+                                BackgroundColor="{StaticResource BackgroundSoft}"
+                                TextColor="{StaticResource PrimaryGreen}"
+                                CornerRadius="12" Padding="14"
+                                Clicked="OnStartNewRoundClicked" />
+                        <Button Text="Review Scorecard"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource TextMuted}"
+                                Clicked="OnReviewScorecardClicked" />
+                    </VerticalStackLayout>
+                </ScrollView>
+            </Border>
+        </Grid>
+    </Grid>
+</ContentPage>
