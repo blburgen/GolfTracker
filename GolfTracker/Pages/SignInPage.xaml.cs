@@ -3,8 +3,11 @@ using Microsoft.Maui.Storage;
 
 namespace GolfTracker.Pages;
 
+
+
 public partial class SignIn : ContentPage
 {
+    string clientID = Environment.GetEnvironmentVariable("CLIENT_ID") ?? "a";
     public SignIn()
     {
         InitializeComponent();
