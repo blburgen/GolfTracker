@@ -5,28 +5,433 @@
     xmlns:controls="clr-namespace:GolfTracker.Controls"
     x:Class="GolfTracker.Pages.NewGame"
     Title="New Game"
-    BackgroundColor="{StaticResource BackgroundWhite}">
+    BackgroundColor="{StaticResource BackgroundWhite}"
+    SizeChanged="OnPageSizeChanged">
 
+    <!-- Main layout -->
     <Grid RowDefinitions="Auto,*">
 
-        <!-- Shared navigation header -->
-        <controls:NavigationHeader
-            Grid.Row="0" />
+        <!-- Navigation header -->
+        <controls:NavigationHeader Grid.Row="0" />
 
-        <!-- NewGame page content -->
+        <!-- Scrollable page content -->
         <ScrollView Grid.Row="1">
 
-            <VerticalStackLayout
-                Padding="24"
-                Spacing="20"
-                VerticalOptions="Center">
+            <VerticalStackLayout Spacing="30">
 
-                <Label
-                    Text="New Game Tab Placeholder"
-                    FontSize="28"
-                    FontAttributes="Bold"
-                    TextColor="{StaticResource PrimaryGreen}"
-                    HorizontalTextAlignment="Center" />
+                <Grid
+                    x:Name="NewGameGrid"
+                    ColumnDefinitions="*,*"
+                    ColumnSpacing="20"
+                    MinimumHeightRequest="450"
+                    Padding="20">
+
+                    <!-- Left column -->
+                    <VerticalStackLayout
+                        x:Name="NewGameForm"
+                        Grid.Column="0"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Fill"
+                        Spacing="15">
+
+                        <!-- Original form heading -->
+                        <VerticalStackLayout
+                            x:Name="NewGameFormHeader"
+                            Spacing="5">
+
+                            <Label
+                                Text="Start a New Round"
+                                FontSize="28"
+                                FontAttributes="Bold"
+                                TextColor="{StaticResource PrimaryGreen}" />
+
+                            <Label
+                                Text="Enter your course details to get started"
+                                FontSize="18"
+                                TextColor="{StaticResource TextMuted}" />
+
+                        </VerticalStackLayout>
+
+                        <!-- Original form card -->
+                        <Border
+                            x:Name="NewGameFormCard"
+                            BackgroundColor="{StaticResource BackgroundWhite}"
+                            Stroke="#DFE8DE"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 20"
+                            Padding="25"
+                            HorizontalOptions="Fill">
+
+                            <VerticalStackLayout Spacing="20">
+
+                                <!-- Course name -->
+                                <VerticalStackLayout Spacing="5">
+
+                                    <Label
+                                        Text="Course Name"
+                                        TextColor="{StaticResource PrimaryGreen}"
+                                        FontAttributes="Bold" />
+
+                                    <Border
+                                        BackgroundColor="{StaticResource BackgroundWhite}"
+                                        Stroke="#DFE8DE"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 20">
+
+                                        <Entry
+                                            x:Name="CourseNameEntry"
+                                            Placeholder="Oak Valley Golf Club"
+                                            TextColor="{StaticResource TextDark}"
+                                            PlaceholderColor="{StaticResource TextMuted}"
+                                            TextChanged="OnCourseNameChanged" />
+
+                                    </Border>
+
+                                </VerticalStackLayout>
+
+                                <!-- Round date -->
+                                <VerticalStackLayout Spacing="5">
+
+                                    <Label
+                                        Text="Round Date"
+                                        TextColor="{StaticResource PrimaryGreen}"
+                                        FontAttributes="Bold" />
+
+                                    <Border
+                                        BackgroundColor="{StaticResource BackgroundWhite}"
+                                        Stroke="#DFE8DE"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 20">
+
+                                        <DatePicker
+                                            x:Name="RoundDatePicker"
+                                            TextColor="{StaticResource TextDark}" />
+
+                                    </Border>
+
+                                </VerticalStackLayout>
+
+                                <!-- Course type -->
+                                <VerticalStackLayout Spacing="5">
+
+                                    <Label
+                                        Text="Course Type"
+                                        TextColor="{StaticResource PrimaryGreen}"
+                                        FontAttributes="Bold" />
+
+                                    <RadioButton
+                                        x:Name="TraditionalRadio"
+                                        GroupName="CourseType"
+                                        Value="Traditional"
+                                        IsChecked="True">
+
+                                        <RadioButton.Content>
+                                            <Label
+                                                Text="Traditional Golf"
+                                                TextColor="{StaticResource TextDark}" />
+                                        </RadioButton.Content>
+
+                                    </RadioButton>
+
+                                    <RadioButton
+                                        x:Name="PutterRadio"
+                                        GroupName="CourseType"
+                                        Value="Putter">
+
+                                        <RadioButton.Content>
+                                            <Label
+                                                Text="Putter Course"
+                                                TextColor="{StaticResource TextDark}" />
+                                        </RadioButton.Content>
+
+                                    </RadioButton>
+
+                                    <RadioButton
+                                        x:Name="ExecutiveRadio"
+                                        GroupName="CourseType"
+                                        Value="Executive">
+
+                                        <RadioButton.Content>
+                                            <Label
+                                                Text="Executive / Par-3"
+                                                TextColor="{StaticResource TextDark}" />
+                                        </RadioButton.Content>
+
+                                    </RadioButton>
+
+                                </VerticalStackLayout>
+
+                                <!-- Number of holes -->
+                                <VerticalStackLayout Spacing="5">
+
+                                    <Label
+                                        Text="Number of Holes"
+                                        TextColor="{StaticResource PrimaryGreen}"
+                                        FontAttributes="Bold" />
+
+                                    <Grid
+                                        ColumnDefinitions="*,*,*"
+                                        ColumnSpacing="5">
+
+                                        <Button
+                                            x:Name="NineHolesButton"
+                                            Grid.Column="0"
+                                            Text="9 holes"
+                                            BackgroundColor="Transparent"
+                                            TextColor="{StaticResource PrimaryGreen}"
+                                            CornerRadius="20"
+                                            Clicked="OnNineHolesClicked" />
+
+                                        <Button
+                                            x:Name="EighteenHolesButton"
+                                            Grid.Column="1"
+                                            Text="18 holes"
+                                            BackgroundColor="{StaticResource PrimaryGreen}"
+                                            TextColor="White"
+                                            CornerRadius="20"
+                                            Clicked="OnEighteenHolesClicked" />
+
+                                        <Button
+                                            x:Name="CustomButton"
+                                            Grid.Column="2"
+                                            Text="Custom"
+                                            BackgroundColor="Transparent"
+                                            TextColor="{StaticResource PrimaryGreen}"
+                                            CornerRadius="20"
+                                            Clicked="OnCustomClicked" />
+
+                                    </Grid>
+
+                                    <Border
+                                        x:Name="CustomHolesBorder"
+                                        IsVisible="False"
+                                        BackgroundColor="{StaticResource BackgroundWhite}"
+                                        Stroke="#DFE8DE"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 20">
+
+                                        <Entry
+                                            x:Name="CustomHolesEntry"
+                                            Placeholder="Enter number of holes"
+                                            TextColor="{StaticResource TextDark}"
+                                            PlaceholderColor="{StaticResource TextMuted}"
+                                            Keyboard="Numeric" />
+
+                                    </Border>
+
+                                </VerticalStackLayout>
+
+                                <!-- Start round button -->
+                                <Button
+                                    x:Name="StartRoundButton"
+                                    Text="Start Round"
+                                    IsEnabled="False"
+                                    MaximumWidthRequest="300"
+                                    BackgroundColor="{StaticResource PrimaryGreen}"
+                                    TextColor="White"
+                                    CornerRadius="10"
+                                    Padding="20,12"
+                                    HorizontalOptions="Fill"
+                                    Clicked="StartRoundClicked" />
+
+                            </VerticalStackLayout>
+
+                        </Border>
+
+                        <!-- PAR SETUP SECTION -->
+                        <VerticalStackLayout
+                            x:Name="ParSetupSection"
+                            IsVisible="False"
+                            Spacing="15">
+
+                            <!-- Section heading -->
+                            <VerticalStackLayout Spacing="5">
+
+                                <Label
+                                    Text="Set Up Course Par"
+                                    FontSize="28"
+                                    FontAttributes="Bold"
+                                    TextColor="{StaticResource PrimaryGreen}" />
+
+                                <Label
+                                    Text="Enter the par for each hole before starting your round."
+                                    FontSize="18"
+                                    TextColor="{StaticResource TextMuted}" />
+
+                            </VerticalStackLayout>
+
+                            <!-- Par setup card -->
+                            <Border
+                                BackgroundColor="{StaticResource BackgroundWhite}"
+                                Stroke="#DFE8DE"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 20"
+                                Padding="25"
+                                HorizontalOptions="Fill">
+
+                                <VerticalStackLayout Spacing="20">
+
+                                    <!-- Current hole -->
+                                    <Label
+                                        x:Name="ParHoleLabel"
+                                        Text="Hole 1 of 9"
+                                        FontSize="24"
+                                        FontAttributes="Bold"
+                                        HorizontalTextAlignment="Center"
+                                        TextColor="{StaticResource PrimaryGreen}" />
+
+                                    <!-- Progress -->
+                                    <Label
+                                        x:Name="ParProgressLabel"
+                                        Text="0 of 9 holes completed"
+                                        FontSize="14"
+                                        HorizontalTextAlignment="Center"
+                                        TextColor="{StaticResource TextMuted}" />
+
+                                    <Label
+                                        Text="Par for this hole"
+                                        FontSize="18"
+                                        HorizontalTextAlignment="Center"
+                                        TextColor="{StaticResource TextDark}" />
+
+                                    <!-- Preset par choices -->
+                                    <Grid
+                                        ColumnDefinitions="*,*,*"
+                                        ColumnSpacing="10">
+
+                                        <Button
+                                            x:Name="ParThreeButton"
+                                            Grid.Column="0"
+                                            Text="3"
+                                            BackgroundColor="Transparent"
+                                            TextColor="{StaticResource PrimaryGreen}"
+                                            BorderColor="{StaticResource PrimaryGreen}"
+                                            BorderWidth="1"
+                                            CornerRadius="12"
+                                            Clicked="OnParThreeClicked" />
+
+                                        <Button
+                                            x:Name="ParFourButton"
+                                            Grid.Column="1"
+                                            Text="4"
+                                            BackgroundColor="Transparent"
+                                            TextColor="{StaticResource PrimaryGreen}"
+                                            BorderColor="{StaticResource PrimaryGreen}"
+                                            BorderWidth="1"
+                                            CornerRadius="12"
+                                            Clicked="OnParFourClicked" />
+
+                                        <Button
+                                            x:Name="ParFiveButton"
+                                            Grid.Column="2"
+                                            Text="5"
+                                            BackgroundColor="Transparent"
+                                            TextColor="{StaticResource PrimaryGreen}"
+                                            BorderColor="{StaticResource PrimaryGreen}"
+                                            BorderWidth="1"
+                                            CornerRadius="12"
+                                            Clicked="OnParFiveClicked" />
+
+                                    </Grid>
+
+                                    <!-- Custom par -->
+                                    <VerticalStackLayout Spacing="5">
+
+                                        <Label
+                                            Text="Other Par"
+                                            TextColor="{StaticResource PrimaryGreen}"
+                                            FontAttributes="Bold" />
+
+                                        <Border
+                                            BackgroundColor="{StaticResource BackgroundWhite}"
+                                            Stroke="#DFE8DE"
+                                            StrokeThickness="1"
+                                            StrokeShape="RoundRectangle 20">
+
+                                            <Entry
+                                                x:Name="ParValueEntry"
+                                                Placeholder="Or enter a par value"
+                                                Keyboard="Numeric"
+                                                HorizontalTextAlignment="Center"
+                                                TextColor="{StaticResource TextDark}"
+                                                PlaceholderColor="{StaticResource TextMuted}"
+                                                TextChanged="OnParValueChanged" />
+
+                                        </Border>
+
+                                    </VerticalStackLayout>
+
+                                    <!-- Previous / next buttons -->
+                                    <Grid
+                                        ColumnDefinitions="*,*"
+                                        ColumnSpacing="10">
+
+                                        <Button
+                                            x:Name="PreviousParButton"
+                                            Grid.Column="0"
+                                            Text="Previous"
+                                            BackgroundColor="{StaticResource BackgroundSoft}"
+                                            TextColor="{StaticResource PrimaryGreen}"
+                                            CornerRadius="10"
+                                            Clicked="OnPreviousParClicked" />
+
+                                        <Button
+                                            x:Name="NextParButton"
+                                            Grid.Column="1"
+                                            Text="Next Hole"
+                                            BackgroundColor="{StaticResource PrimaryGreen}"
+                                            TextColor="White"
+                                            CornerRadius="10"
+                                            Clicked="OnNextParClicked" />
+
+                                    </Grid>
+
+                                    <!-- Final action -->
+                                    <Button
+                                        x:Name="FinishParButton"
+                                        Text="Finish Par Setup"
+                                        IsVisible="False"
+                                        BackgroundColor="{StaticResource PrimaryGreen}"
+                                        TextColor="White"
+                                        CornerRadius="10"
+                                        Padding="20,12"
+                                        Clicked="OnFinishParSetupClicked" />
+
+                                    <!-- Return to original form -->
+                                    <Button
+                                        Text="Back to Round Setup"
+                                        BackgroundColor="Transparent"
+                                        TextColor="{StaticResource TextMuted}"
+                                        Clicked="OnCancelParSetupClicked" />
+
+                                </VerticalStackLayout>
+
+                            </Border>
+
+                        </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+
+                    <!-- Right column: Golf course image -->
+                    <Border
+                        x:Name="NewGameImage"
+                        Grid.Column="1"
+                        Margin="20"
+                        Padding="0"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 20"
+                        VerticalOptions="Fill"
+                        HorizontalOptions="Fill">
+
+                        <Image
+                            Source="golf_course_2.jpg"
+                            Aspect="AspectFill"
+                            HorizontalOptions="Fill"
+                            VerticalOptions="Fill" />
+
+                    </Border>
+
+                </Grid>
 
             </VerticalStackLayout>
 
