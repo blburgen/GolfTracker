@@ -74,4 +74,8 @@
 		<PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
 	</ItemGroup>
 
+	<ItemGroup>
+  		<EmbeddedResource Include=".env" />
+	</ItemGroup>
+
 </Project>
