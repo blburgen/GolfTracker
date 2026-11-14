@@ -27,30 +27,30 @@ public static class MauiProgram
 	}
 
 	private static void LoadEnvironmentVariables()
-    {
-        var assembly = Assembly.GetExecutingAssembly();
-        var resourceName = $"{assembly.GetName().Name}..env";
+	{
+		var assembly = Assembly.GetExecutingAssembly();
+		var resourceName = $"{assembly.GetName().Name}..env";
 
-        using var stream = assembly.GetManifestResourceStream(resourceName);
-        if (stream == null) return;
+		using var stream = assembly.GetManifestResourceStream(resourceName);
+		if (stream == null) return;
 
-        using var reader = new StreamReader(stream);
-        while (reader.ReadLine() is { } line)
-        {
-            var trimmed = line.Trim();
+		using var reader = new StreamReader(stream);
+		while (reader.ReadLine() is { } line)
+		{
+			var trimmed = line.Trim();
 
-            // Skip empty lines and comments
-            if (string.IsNullOrEmpty(trimmed) || trimmed.StartsWith('#'))
-                continue;
+			// Skip empty lines and comments
+			if (string.IsNullOrEmpty(trimmed) || trimmed.StartsWith('#'))
+				continue;
 
-            var parts = trimmed.Split('=', 2);
-            if (parts.Length == 2)
-            {
-                var key = parts[0].Trim();
-                // Remove optional surrounding quotes from values
-                var value = parts[1].Trim().Trim('"', '\'');
-                Environment.SetEnvironmentVariable(key, value);
-            }
-        }
-    }
+			var parts = trimmed.Split('=', 2);
+			if (parts.Length == 2)
+			{
+				var key = parts.First().Trim();
+				// Remove optional surrounding quotes from values
+				var value = parts.Last().Trim().Trim('"', '\'');
+				Environment.SetEnvironmentVariable(key, value);
+			}
+		}
+	}
 }
