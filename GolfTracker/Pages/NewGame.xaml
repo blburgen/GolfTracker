@@ -122,42 +122,24 @@
                                     <RadioButton
                                         x:Name="TraditionalRadio"
                                         GroupName="CourseType"
+                                        IsChecked="True"
                                         Value="Traditional"
-                                        IsChecked="True">
-
-                                        <RadioButton.Content>
-                                            <Label
-                                                Text="Traditional Golf"
-                                                TextColor="{StaticResource TextDark}" />
-                                        </RadioButton.Content>
-
-                                    </RadioButton>
+                                        TextColor="{StaticResource TextDark}"
+                                        Content="Traditional Golf" />
 
                                     <RadioButton
                                         x:Name="PutterRadio"
                                         GroupName="CourseType"
-                                        Value="Putter">
-
-                                        <RadioButton.Content>
-                                            <Label
-                                                Text="Putter Course"
-                                                TextColor="{StaticResource TextDark}" />
-                                        </RadioButton.Content>
-
-                                    </RadioButton>
+                                        Value="Putter"
+                                        TextColor="{StaticResource TextDark}"
+                                        Content="Putter" />
 
                                     <RadioButton
                                         x:Name="ExecutiveRadio"
                                         GroupName="CourseType"
-                                        Value="Executive">
-
-                                        <RadioButton.Content>
-                                            <Label
-                                                Text="Executive / Par-3"
-                                                TextColor="{StaticResource TextDark}" />
-                                        </RadioButton.Content>
-
-                                    </RadioButton>
+                                        Value="Executive"
+                                        TextColor="{StaticResource TextDark}"
+                                        Content="Executive" />
 
                                 </VerticalStackLayout>
 
