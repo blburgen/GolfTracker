@@ -25,12 +25,23 @@
                             Padding="25">
                         <VerticalStackLayout Spacing="8">
                             <Label x:Name="DesktopRoundDateAndType"
-                                   FontSize="16" TextColor="{StaticResource TextMuted}" />
+                                   FontSize="16" 
+                                   TextColor="{StaticResource TextMuted}" />
                             <Label x:Name="DesktopCourseName"
-                                   FontSize="30" FontAttributes="Bold"
+                                   FontSize="30" 
+                                   FontAttributes="Bold"
                                    TextColor="{StaticResource PrimaryGreen}" />
                             <Label x:Name="DesktopRoundHoleCount"
-                                   FontSize="16" TextColor="{StaticResource TextDark}" />
+                                   FontSize="16" 
+                                   TextColor="{StaticResource TextDark}" />
+                            <Button x:Name="DesktopFinishEarlyButton" Text="End Round"
+                                        BackgroundColor="#FFAD1902"
+                                        TextColor="White" 
+                                        CornerRadius="12" 
+                                        Padding="15"
+                                        Clicked="OnFinishEarlyClicked" 
+                                        MaximumWidthRequest="150"
+                                        HorizontalOptions="End"/>
                         </VerticalStackLayout>
                     </Border>
 
@@ -176,12 +187,25 @@
                     <Border Grid.Row="0" BackgroundColor="{StaticResource BackgroundSoft}"
                             StrokeThickness="0" StrokeShape="RoundRectangle 20" Padding="20">
                         <VerticalStackLayout Spacing="10">
-                            <Label x:Name="RoundDateAndType" FontSize="14"
-                                   TextColor="{StaticResource TextMuted}" />
-                            <Label x:Name="CourseName" FontSize="26" FontAttributes="Bold"
-                                   TextColor="{StaticResource PrimaryGreen}" />
-                            <Label x:Name="RoundHoleCount" FontSize="16"
-                                   TextColor="{StaticResource TextDark}" />
+                            <Label x:Name="RoundDateAndType" 
+                                FontSize="14"
+                                TextColor="{StaticResource TextMuted}" />
+                            <Label x:Name="CourseName" 
+                                FontSize="26" 
+                                FontAttributes="Bold"
+                                TextColor="{StaticResource PrimaryGreen}" />
+                            <Label x:Name="RoundHoleCount" 
+                                FontSize="16"
+                                TextColor="{StaticResource TextDark}" />
+                            <Button x:Name="MobileFinishEarlyButton" 
+                                    Text="End Round"
+                                    BackgroundColor="#FFAD1902"
+                                    TextColor="White" 
+                                    CornerRadius="12" 
+                                    Padding="15"
+                                    Clicked="OnFinishEarlyClicked" 
+                                    MaximumWidthRequest="150"
+                                    HorizontalOptions="End"/>
                         </VerticalStackLayout>
                     </Border>
 
@@ -284,6 +308,34 @@
                                        FontSize="18" FontAttributes="Bold"
                                        TextColor="{StaticResource PrimaryGreen}" />
                             </Grid>
+
+                            <Border Grid.Column="0"
+                                BackgroundColor="{StaticResource BackgroundWhite}"
+                                Stroke="#DFE8DE" StrokeThickness="1"
+                                StrokeShape="RoundRectangle 20" Padding="20">
+                            <VerticalStackLayout Spacing="15">
+                                <Label Text="Course Scorecard" FontSize="24"
+                                       FontAttributes="Bold" TextColor="{StaticResource PrimaryGreen}" />
+                                <Label Text="Select any hole to enter or edit its score."
+                                       FontSize="14" TextColor="{StaticResource TextMuted}" />
+                                <Grid ColumnDefinitions="90,*,*,*" ColumnSpacing="8" Padding="8">
+                                    <Label Grid.Column="0" Text="Hole" FontAttributes="Bold"
+                                           TextColor="{StaticResource PrimaryGreen}" />
+                                    <Label Grid.Column="1" Text="Par" FontAttributes="Bold"
+                                           HorizontalTextAlignment="Center"
+                                           TextColor="{StaticResource PrimaryGreen}" />
+                                    <Label Grid.Column="2" Text="Strokes" FontAttributes="Bold"
+                                           HorizontalTextAlignment="Center"
+                                           TextColor="{StaticResource PrimaryGreen}" />
+                                    <Label Grid.Column="3" Text="Result" FontAttributes="Bold"
+                                           HorizontalTextAlignment="Center"
+                                           TextColor="{StaticResource PrimaryGreen}" />
+                                </Grid>
+                                <BoxView HeightRequest="1" Color="#DFE8DE" />
+                                <VerticalStackLayout x:Name="MobileHoleRows" Spacing="5" />
+                            </VerticalStackLayout>
+                        </Border>
+
                         </VerticalStackLayout>
                     </Border>
                 </Grid>
