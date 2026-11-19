@@ -236,12 +236,18 @@ public partial class NewGame : ContentPage
         // Ask whether the player wants to enter par
         bool wantsPar = await DisplayAlertAsync(
             "Course Par",
-            "Would you like to enter par for each hole?",
+            "Would you like to enter par for each hole? \nDefault is 3 par",
             "Yes",
             "No");
 
         if (!wantsPar)
         {
+             // Default every hole to par 3
+            int[] defaultPars = Enumerable.Repeat(3, numberOfHoles).ToArray();
+
+            // Send the default par values to Scorecard
+            parameters.Add("HolePars", defaultPars);
+            
             // No par setup needed
             await Shell.Current.GoToAsync(
                 "//Scorecard",

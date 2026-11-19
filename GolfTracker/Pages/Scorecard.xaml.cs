@@ -16,6 +16,11 @@ public partial class Scorecard : ContentPage, IQueryAttributable
     public Scorecard()
     {
         InitializeComponent();
+
+    #if WINDOWS
+        Loaded += OnScorecardLoaded;
+        Unloaded += OnScorecardUnloaded;
+    #endif
     }
 
     private void OnPageSizeChanged(object? sender, EventArgs e)
@@ -156,6 +161,162 @@ public partial class Scorecard : ContentPage, IQueryAttributable
 
         UpdateRoundSummary();
         UpdateDesktopHoleTable();
+        UpdateMobileHoleTable();
+    }
+ private void UpdateMobileHoleTable()
+    {
+        MobileHoleRows.Children.Clear();
+
+        Color primaryGreen =
+            (Color)Application.Current!.Resources["PrimaryGreen"];
+
+        Color textDark =
+            (Color)Application.Current.Resources["TextDark"];
+
+        Color textMuted =
+            (Color)Application.Current.Resources["TextMuted"];
+
+        Color backgroundSoft =
+            (Color)Application.Current.Resources["BackgroundSoft"];
+
+        for (int i = 0; i < numberOfHoles; i++)
+        {
+            int holeNumber = i + 1;
+            int? strokes = holeStrokes[i];
+
+            string parText =
+                holePars != null ? holePars[i].ToString() : "—";
+
+            string strokesText =
+                strokes?.ToString() ?? "—";
+
+            string resultText = "—";
+
+            if (strokes.HasValue && holePars != null)
+            {
+                int difference = strokes.Value - holePars[i];
+
+                resultText = difference > 0
+                    ? $"+{difference}"
+                    : difference.ToString();
+            }
+
+            Grid row = new Grid
+            {
+                ColumnSpacing = 8,
+                Padding = new Thickness(8),
+                BackgroundColor = holeNumber == currentHole
+                    ? backgroundSoft
+                    : Colors.Transparent
+            };
+
+            row.ColumnDefinitions.Add(
+                new ColumnDefinition
+                {
+                    Width = new GridLength(90)
+                });
+
+            row.ColumnDefinitions.Add(
+                new ColumnDefinition
+                {
+                    Width = GridLength.Star
+                });
+
+            row.ColumnDefinitions.Add(
+                new ColumnDefinition
+                {
+                    Width = GridLength.Star
+                });
+
+            row.ColumnDefinitions.Add(
+                new ColumnDefinition
+                {
+                    Width = GridLength.Star
+                });
+
+            row.RowDefinitions.Add(
+                new RowDefinition
+                {
+                    Height = GridLength.Auto
+                });
+
+            Button holeButton = new Button
+            {
+                Text = holeNumber.ToString(),
+                BackgroundColor = holeNumber == currentHole
+                    ? primaryGreen
+                    : backgroundSoft,
+                TextColor = holeNumber == currentHole
+                    ? Colors.White
+                    : primaryGreen,
+                CornerRadius = 8,
+                Padding = new Thickness(8),
+                HeightRequest = 40
+            };
+
+            int selectedHole = holeNumber;
+
+            holeButton.Clicked += (sender, e) =>
+            {
+                currentHole = selectedHole;
+                UpdateScorecard();
+            };
+
+            Entry parEntry = new Entry
+            {
+                Text = parText,
+                Keyboard = Keyboard.Numeric,
+                TextColor = primaryGreen,
+                BackgroundColor = backgroundSoft,
+                HorizontalTextAlignment = TextAlignment.Center,
+                MaximumWidthRequest = 80
+            };
+
+            parEntry.Focused += (sender, e) =>
+            {
+                parEntry.CursorPosition = 0;
+                parEntry.SelectionLength = parEntry.Text?.Length ?? 0;
+            };
+
+            parEntry.Completed += (sender, e) =>
+            {
+                // Read and validate the new par
+                if (int.TryParse(parEntry.Text, out int newPar)
+                    && newPar > 0
+                    && holePars != null)
+                {
+                    // Update the selected hole's par
+                    holePars[selectedHole - 1] = newPar;
+
+                    // Refresh the scorecard
+                    UpdateScorecard();
+                }
+            };
+
+            Label strokesLabel = new Label
+            {
+                Text = strokesText,
+                TextColor = primaryGreen,
+                FontAttributes = FontAttributes.Bold,
+                HorizontalTextAlignment = TextAlignment.Center,
+                VerticalTextAlignment = TextAlignment.Center
+            };
+
+            Label resultLabel = new Label
+            {
+                Text = resultText,
+                TextColor = textMuted,
+                HorizontalTextAlignment = TextAlignment.Center,
+                VerticalTextAlignment = TextAlignment.Center
+            };
+
+            row.Add(holeButton, 0, 0);
+            row.Add(parEntry, 1, 0);
+            row.Add(strokesLabel, 2, 0);
+            row.Add(resultLabel, 3, 0);
+
+            MobileHoleRows.Children.Add(row);
+        }
     }
 
     private void UpdateDesktopHoleTable()
@@ -257,12 +418,35 @@ public partial class Scorecard : ContentPage, IQueryAttributable
                 UpdateScorecard();
             };
 
-            Label parLabel = new Label
+            Entry parEntry = new Entry
             {
                 Text = parText,
-                TextColor = textDark,
+                Keyboard = Keyboard.Numeric,
+                TextColor = primaryGreen,
+                BackgroundColor = backgroundSoft,
                 HorizontalTextAlignment = TextAlignment.Center,
-                VerticalTextAlignment = TextAlignment.Center
+                MaximumWidthRequest = 80
+            };
+
+            parEntry.Focused += (sender, e) =>
+            {
+                parEntry.CursorPosition = 0;
+                parEntry.SelectionLength = parEntry.Text?.Length ?? 0;
+            };
+
+            parEntry.Completed += (sender, e) =>
+            {
+                // Read and validate the new par
+                if (int.TryParse(parEntry.Text, out int newPar)
+                    && newPar > 0
+                    && holePars != null)
+                {
+                    // Update the selected hole's par
+                    holePars[selectedHole - 1] = newPar;
+
+                    // Refresh the scorecard
+                    UpdateScorecard();
+                }
             };
 
             Label strokesLabel = new Label
@@ -283,7 +467,7 @@ public partial class Scorecard : ContentPage, IQueryAttributable
             };
 
             row.Add(holeButton, 0, 0);
-            row.Add(parLabel, 1, 0);
+            row.Add(parEntry, 1, 0);
             row.Add(strokesLabel, 2, 0);
             row.Add(resultLabel, 3, 0);
 
@@ -366,7 +550,7 @@ public partial class Scorecard : ContentPage, IQueryAttributable
     // --------------------------------------------------
     // ROUND COMPLETE POPUP
     // --------------------------------------------------
-
+    
     private async void OnFinishRoundClicked(object? sender, EventArgs e)
     {
         if (numberOfHoles <= 0 ||
@@ -407,6 +591,36 @@ public partial class Scorecard : ContentPage, IQueryAttributable
         RoundCompleteOverlay.IsVisible = true;
     }
 
+     private async void OnFinishEarlyClicked(object? sender, EventArgs e)
+    {
+
+        int totalStrokes = holeStrokes.Sum(strokes => strokes ?? 0);
+        int completedHoles = holeStrokes.Count(strokes => strokes.HasValue);
+
+        FinalCourseLabel.Text = roundCourseName;
+
+        FinalDetailsLabel.Text =
+            $"{roundDate:MMMM d, yyyy} · {roundCourseType}";
+
+        FinalStrokesLabel.Text = totalStrokes.ToString();
+
+        FinalHoleCountLabel.Text =
+            $"{completedHoles} out of {numberOfHoles} holes completed";
+
+        FinalParCard.IsVisible = holePars != null;
+
+        if (holePars != null)
+        {
+            int difference = totalStrokes - holePars.Sum();
+
+            FinalParLabel.Text = difference > 0
+                ? $"+{difference}"
+                : difference.ToString();
+        }
+
+        RoundCompleteOverlay.IsVisible = true;
+    }
+
     private void OnReviewScorecardClicked(object? sender, EventArgs e)
     {
         RoundCompleteOverlay.IsVisible = false;
@@ -430,4 +644,79 @@ public partial class Scorecard : ContentPage, IQueryAttributable
             "The round is not saved to History.",
             "OK");
     }
+
+
+   
+
+#if WINDOWS
+private Microsoft.UI.Xaml.UIElement? keyboardElement;
+private Microsoft.UI.Xaml.Input.KeyEventHandler? keyboardHandler;
+
+private void OnScorecardLoaded(object? sender, EventArgs e)
+{
+    if (Handler?.PlatformView is not Microsoft.UI.Xaml.UIElement element)
+        return;
+
+    keyboardElement =
+        element.XamlRoot?.Content as Microsoft.UI.Xaml.UIElement;
+
+    if (keyboardElement == null)
+        return;
+
+    keyboardHandler = OnWindowsKeyDown;
+
+    keyboardElement.AddHandler(
+        Microsoft.UI.Xaml.UIElement.KeyDownEvent,
+        keyboardHandler,
+        true);
+}
+private void OnScorecardUnloaded(object? sender, EventArgs e)
+{
+    if (keyboardElement != null && keyboardHandler != null)
+    {
+        keyboardElement.RemoveHandler(
+            Microsoft.UI.Xaml.UIElement.KeyDownEvent,
+            keyboardHandler);
+    }
+
+    keyboardElement = null;
+    keyboardHandler = null;
+}
+
+private void OnWindowsKeyDown(
+    object sender,
+    Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+{
+    if (numberOfHoles <= 0 || RoundCompleteOverlay.IsVisible)
+        return;
+
+    // Don't intercept keys when typing in a text box
+    if (e.OriginalSource is Microsoft.UI.Xaml.Controls.TextBox)
+        return;
+
+    int strokes;
+
+    if (e.Key >= Windows.System.VirtualKey.Number0 &&
+        e.Key <= Windows.System.VirtualKey.Number9)
+    {
+        strokes = (int)e.Key - (int)Windows.System.VirtualKey.Number0;
+    }
+    else if (e.Key >= Windows.System.VirtualKey.NumberPad0 &&
+             e.Key <= Windows.System.VirtualKey.NumberPad9)
+    {
+        strokes = (int)e.Key - (int)Windows.System.VirtualKey.NumberPad0;
+    }
+    else
+    {
+        return;
+    }
+
+    holeStrokes[currentHole - 1] = strokes == 0 ? null : strokes;
+
+    UpdateScorecard();
+    e.Handled = true;
+}
+#endif
+
+
 }
