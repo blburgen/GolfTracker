@@ -417,11 +417,11 @@
                         <Label x:Name="FinalHoleCountLabel" FontSize="14"
                                HorizontalTextAlignment="Center"
                                TextColor="{StaticResource TextMuted}" />
-                        <Label Text="Sign in to save this round to your history."
+                        <Label Text="Sign in to save this round permanantly to your history."
                                FontSize="13" HorizontalTextAlignment="Center"
                                TextColor="{StaticResource TextMuted}" />
                         <BoxView HeightRequest="1" Color="#DFE8DE" />
-                        <Button Text="Sign In to Save"
+                        <Button Text="Sign In to Save Permanantly"
                                 BackgroundColor="{StaticResource PrimaryGreen}"
                                 TextColor="White" CornerRadius="12" Padding="14"
                                 Clicked="OnSignInToSaveClicked" />
@@ -430,6 +430,11 @@
                                 TextColor="{StaticResource PrimaryGreen}"
                                 CornerRadius="12" Padding="14"
                                 Clicked="OnStartNewRoundClicked" />
+                        <Button Text="History"
+                                BackgroundColor="{StaticResource BackgroundSoft}"
+                                TextColor="{StaticResource PrimaryGreen}"
+                                CornerRadius="12" Padding="14"
+                                Clicked="OnHistoryClicked" />
                         <Button Text="Review Scorecard"
                                 BackgroundColor="Transparent"
                                 TextColor="{StaticResource TextMuted}"
