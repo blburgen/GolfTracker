@@ -59,12 +59,16 @@ public partial class History : ContentPage
     {
         int total = rounds.Count;
 
-        double average = rounds.Count > 0
-            ? rounds.Average(r => r.TotalStrokes)
+        List<GolfRound> scoredRounds = rounds
+            .Where(r => r.HolesCompleted > 0)
+            .ToList();
+
+        double average = scoredRounds.Count > 0
+            ? scoredRounds.Average(r => r.TotalStrokes)
             : 0;
 
-        int bestScore = rounds.Count > 0
-            ? rounds.Min(r => r.TotalStrokes)
+        int bestScore = scoredRounds.Count > 0
+            ? scoredRounds.Min(r => r.TotalStrokes)
             : 0;
 
         totalRounds.Text = total.ToString();
