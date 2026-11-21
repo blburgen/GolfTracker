@@ -226,7 +226,7 @@
                                                 TextColor="{StaticResource TextMuted}" />
 
                                             <Label
-                                                Text="{Binding NumberOfHoles, StringFormat='{0} holes'}"
+                                                Text="{Binding HolesCompleted, StringFormat='{0} holes completed'}"
                                                 TextColor="{StaticResource TextMuted}" />
 
                                         </VerticalStackLayout>
