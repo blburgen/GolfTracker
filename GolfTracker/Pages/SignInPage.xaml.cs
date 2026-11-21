@@ -106,3 +106,4 @@ public partial class SignIn : ContentPage
         await Shell.Current.GoToAsync("//WelcomePage");
     }
 }
+ 
