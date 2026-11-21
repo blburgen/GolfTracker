@@ -7,6 +7,7 @@ public partial class Scorecard : ContentPage, IQueryAttributable
 {
     private readonly GolfDatabase _database;
     private int? _savedRoundId;
+    private bool _isSaving;
 
     private int numberOfHoles;
     private int currentHole = 1;
@@ -643,6 +644,12 @@ public partial class Scorecard : ContentPage, IQueryAttributable
 
     private async void OnSignInToSaveClicked(object? sender, EventArgs e)
     {
+        if (_isSaving)
+            return;
+
+        _isSaving = true;
+        SaveRoundButton.IsEnabled = false;
+
         try
         {
             bool isCompleted = numberOfHoles > 0 && holeStrokes.All(s => s.HasValue);
@@ -710,6 +717,11 @@ public partial class Scorecard : ContentPage, IQueryAttributable
                 "Save Failed",
                 $"Could not save your round: {ex.Message}",
                 "OK");
+        }
+        finally
+        {
+            SaveRoundButton.IsEnabled = true;
+            _isSaving = false;
         }
     }
 
