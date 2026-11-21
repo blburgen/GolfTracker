@@ -5,33 +5,481 @@
     xmlns:controls="clr-namespace:GolfTracker.Controls"
     x:Class="GolfTracker.Pages.History"
     Title="History"
-    BackgroundColor="{StaticResource BackgroundWhite}">
+    BackgroundColor="{StaticResource BackgroundSoft}"
+    SizeChanged="OnPageSizeChanged">
 
     <Grid RowDefinitions="Auto,*">
+        <controls:NavigationHeader Grid.Row="0" />
 
-        <!-- Shared navigation header -->
-        <controls:NavigationHeader
-            Grid.Row="0" />
-
-        <!-- History page content -->
         <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="5">
 
-            <VerticalStackLayout
-                Padding="24"
-                Spacing="20"
-                VerticalOptions="Center">
+                <!-- DESKTOP HISTORY -->
+                <VerticalStackLayout
+                    x:Name="DesktopHistory"
+                    IsVisible="False"
+                    Padding="30"
+                    Spacing="20">
 
-                <Label
-                    Text="History Tab Placeholder"
-                    FontSize="28"
-                    FontAttributes="Bold"
-                    TextColor="{StaticResource PrimaryGreen}"
-                    HorizontalTextAlignment="Center" />
+                    <!-- Page heading -->
+                    <Grid
+                        ColumnDefinitions="*,Auto"
+                        ColumnSpacing="20">
+
+                        <!-- LEFT SIDE: Title and Subtitle -->
+                        <VerticalStackLayout
+                            Grid.Column="0"
+                            Spacing="5"
+                            VerticalOptions="Center">
+
+                            <Label
+                                x:Name="HistoryTitle"
+                                Text="Your Golf History"
+                                FontSize="24"
+                                FontAttributes="Bold"
+                                TextColor="{StaticResource PrimaryGreen}" />
+
+                            <Label
+                                Text="Review your rounds and track your progress"
+                                FontSize="18"
+                                TextColor="{StaticResource TextMuted}" />
+
+                        </VerticalStackLayout>
+
+                        <!-- RIGHT SIDE: Button -->
+                        <Button
+                            x:Name="NewRound"
+                            Grid.Column="1"
+                            Text="+ New Round"
+                            BackgroundColor="{StaticResource PrimaryGreen}"
+                            TextColor="White"
+                            CornerRadius="10"
+                            Clicked="OnNewRoundClicked"
+                            HorizontalOptions="End"
+                            VerticalOptions="Center" />
+
+                    </Grid>
+
+                    <!-- Desktop statistics -->
+                    <Grid
+                        ColumnDefinitions="*,*,*"
+                        ColumnSpacing="20">
+
+                        <!-- Total Rounds -->
+                        <Border
+                            BackgroundColor="{StaticResource BackgroundWhite}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 20"
+                            Padding="25"
+                            Grid.Column="0">
+
+                            <VerticalStackLayout Spacing="5">
+                                <Image
+                                    Source="flag.png"
+                                    HeightRequest="28"
+                                    WidthRequest="28"
+                                    HorizontalOptions="Start" />
+
+                                <Label
+                                    x:Name="totalRounds"
+                                    TextColor="{StaticResource PrimaryGreen}"
+                                    FontSize="24" />
+
+                                <Label
+                                    Text="Total Rounds"
+                                    TextColor="{StaticResource TextMuted}"
+                                    FontSize="18" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Average Score -->
+                        <Border
+                            BackgroundColor="{StaticResource BackgroundWhite}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 20"
+                            Padding="25"
+                            Grid.Column="1">
+
+                            <VerticalStackLayout Spacing="5">
+                                <Image
+                                    Source="improve_gold.png"
+                                    HeightRequest="28"
+                                    WidthRequest="28"
+                                    HorizontalOptions="Start" />
+
+                                <Label
+                                    x:Name="averageScore"
+                                    TextColor="{StaticResource PrimaryGreen}"
+                                    FontSize="24" />
+
+                                <Label
+                                    Text="Average Score"
+                                    TextColor="{StaticResource TextMuted}"
+                                    FontSize="18" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Best Score -->
+                        <Border
+                            BackgroundColor="{StaticResource BackgroundWhite}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 20"
+                            Padding="25"
+                            Grid.Column="2">
+
+                            <VerticalStackLayout Spacing="5">
+                                <Image
+                                    Source="trophy.png"
+                                    HeightRequest="28"
+                                    WidthRequest="28"
+                                    HorizontalOptions="Start" />
+
+                                <Label
+                                    x:Name="best"
+                                    TextColor="{StaticResource PrimaryGreen}"
+                                    FontSize="24" />
+
+                                <Label
+                                    Text="Best Score"
+                                    TextColor="{StaticResource TextMuted}"
+                                    FontSize="18" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </Grid>
+
+                    <!-- Desktop previous rounds header -->
+                    <Grid
+                        ColumnDefinitions="*,Auto"
+                        ColumnSpacing="15"
+                        Padding="0,10">
+
+                        <Label
+                            Grid.Column="0"
+                            Text="Previous Rounds"
+                            FontSize="22"
+                            FontAttributes="Bold"
+                            TextColor="{StaticResource PrimaryGreen}"
+                            VerticalOptions="Center" />
+
+                        <!-- Styled desktop sorting dropdown -->
+                        <Border
+                            Grid.Column="1"
+                            BackgroundColor="{StaticResource BackgroundWhite}"
+                            Stroke="#DFE8DE"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="10,0"
+                            VerticalOptions="Center">
+
+                            <Picker
+                                x:Name="DesktopRoundSortPicker"
+                                WidthRequest="160"
+                                HeightRequest="45"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource PrimaryGreen}"
+                                SelectedIndexChanged="OnSortChanged">
+
+                                <Picker.Items>
+                                    <x:String>Newest First</x:String>
+                                    <x:String>Oldest First</x:String>
+                                    <x:String>Lowest Score</x:String>
+                                    <x:String>Highest Score</x:String>
+                                    <x:String>Course Name (A-Z)</x:String>
+                                    <x:String>Course Name (Z-A)</x:String>
+                                </Picker.Items>
+
+                            </Picker>
+
+                        </Border>
+
+                    </Grid>
+
+                    <!-- Desktop previous rounds list -->
+                    <CollectionView
+                        ItemsSource="{Binding Rounds}"
+                        x:Name="DesktopRoundsList">
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+
+                                <Border
+                                    BackgroundColor="{StaticResource BackgroundWhite}"
+                                    Stroke="#DFE8DE"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="15"
+                                    Margin="0,5">
+
+                                    <Grid ColumnDefinitions="*,Auto">
+
+                                        <VerticalStackLayout Spacing="5">
+
+                                            <Label
+                                                Text="{Binding CourseName}"
+                                                FontSize="18"
+                                                FontAttributes="Bold"
+                                                TextColor="{StaticResource PrimaryGreen}" />
+
+                                            <Label
+                                                Text="{Binding Date, StringFormat='{0:MMM d, yyyy}'}"
+                                                TextColor="{StaticResource TextMuted}" />
+
+                                            <Label
+                                                Text="{Binding HolesCompleted, StringFormat='{0} holes completed'}"
+                                                TextColor="{StaticResource TextMuted}" />
+
+                                        </VerticalStackLayout>
+
+                                        <Label
+                                            Grid.Column="1"
+                                            Text="{Binding TotalStrokes}"
+                                            FontSize="24"
+                                            FontAttributes="Bold"
+                                            TextColor="{StaticResource PrimaryGreen}"
+                                            VerticalOptions="Center" />
+
+                                    </Grid>
+
+                                </Border>
+
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+
+                    </CollectionView>
+
+                </VerticalStackLayout>
+
+                <!-- MOBILE HISTORY -->
+                <Grid
+                    x:Name="MobileHistory"
+                    RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                    RowSpacing="20"
+                    Padding="20"
+                    MaximumWidthRequest="650"
+                    HorizontalOptions="Fill">
+
+                    <!-- Mobile heading and statistics -->
+                    <VerticalStackLayout Spacing="5">
+
+                        <Label
+                            x:Name="HistoryTitleMobile"
+                            Text="Your Golf History"
+                            FontSize="24"
+                            FontAttributes="Bold"
+                            TextColor="{StaticResource PrimaryGreen}" />
+
+                        <Label
+                            Text="Review your rounds and track your progress"
+                            FontSize="18"
+                            TextColor="{StaticResource TextMuted}" />
+
+                        <Button
+                            x:Name="NewRoundMobile"
+                            Text="+ New Round"
+                            BackgroundColor="{StaticResource PrimaryGreen}"
+                            TextColor="White"
+                            CornerRadius="10"
+                            Clicked="OnNewRoundClicked"
+                            HorizontalOptions="Fill"
+                            HeightRequest="50" />
+
+                        <!-- Mobile statistics -->
+                        <Grid
+                            RowDefinitions="*,*,*"
+                            RowSpacing="20">
+
+                            <!-- Total Rounds -->
+                            <Border
+                                BackgroundColor="{StaticResource BackgroundWhite}"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 20"
+                                Padding="25"
+                                Grid.Row="0">
+
+                                <VerticalStackLayout Spacing="5">
+                                    <Image
+                                        Source="flag.png"
+                                        HeightRequest="28"
+                                        WidthRequest="28"
+                                        HorizontalOptions="Start" />
+
+                                    <Label
+                                        x:Name="totalRoundsMobile"
+                                        TextColor="{StaticResource PrimaryGreen}"
+                                        FontSize="24" />
+
+                                    <Label
+                                        Text="Total Rounds"
+                                        TextColor="{StaticResource TextMuted}"
+                                        FontSize="18" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Average Score -->
+                            <Border
+                                BackgroundColor="{StaticResource BackgroundWhite}"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 20"
+                                Padding="25"
+                                Grid.Row="1">
+
+                                <VerticalStackLayout Spacing="5">
+                                    <Image
+                                        Source="improve_gold.png"
+                                        HeightRequest="28"
+                                        WidthRequest="28"
+                                        HorizontalOptions="Start" />
+
+                                    <Label
+                                        x:Name="averageScoreMobile"
+                                        TextColor="{StaticResource PrimaryGreen}"
+                                        FontSize="24" />
+
+                                    <Label
+                                        Text="Average Score"
+                                        TextColor="{StaticResource TextMuted}"
+                                        FontSize="18" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Best Score -->
+                            <Border
+                                BackgroundColor="{StaticResource BackgroundWhite}"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 20"
+                                Padding="25"
+                                Grid.Row="2">
+
+                                <VerticalStackLayout Spacing="5">
+                                    <Image
+                                        Source="trophy.png"
+                                        HeightRequest="28"
+                                        WidthRequest="28"
+                                        HorizontalOptions="Start" />
+
+                                    <Label
+                                        x:Name="bestMobile"
+                                        TextColor="{StaticResource PrimaryGreen}"
+                                        FontSize="24" />
+
+                                    <Label
+                                        Text="Best Score"
+                                        TextColor="{StaticResource TextMuted}"
+                                        FontSize="18" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                        </Grid>
+
+                    </VerticalStackLayout>
+
+                    <!-- Mobile previous rounds header -->
+                    <Grid
+                        Grid.Row="3"
+                        ColumnDefinitions="*,Auto"
+                        ColumnSpacing="15"
+                        Padding="0,10">
+
+                        <Label
+                            Grid.Column="0"
+                            Text="Previous Rounds"
+                            FontSize="22"
+                            FontAttributes="Bold"
+                            TextColor="{StaticResource PrimaryGreen}"
+                            VerticalOptions="Center" />
+
+                        <!-- Styled mobile sorting dropdown -->
+                        <Border
+                            Grid.Column="1"
+                            BackgroundColor="{StaticResource BackgroundWhite}"
+                            Stroke="#DFE8DE"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="10,0"
+                            VerticalOptions="Center">
+
+                            <Picker
+                                x:Name="MobileRoundSortPicker"
+                                WidthRequest="160"
+                                HeightRequest="45"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource PrimaryGreen}"
+                                SelectedIndexChanged="OnSortChanged">
+
+                                <Picker.Items>
+                                    <x:String>Newest First</x:String>
+                                    <x:String>Oldest First</x:String>
+                                    <x:String>Lowest Score</x:String>
+                                    <x:String>Highest Score</x:String>
+                                    <x:String>Course Name (A-Z)</x:String>
+                                    <x:String>Course Name (Z-A)</x:String>
+                                </Picker.Items>
+
+                            </Picker>
+
+                        </Border>
+
+                    </Grid>
+
+                    <!-- Mobile previous rounds list -->
+                    <CollectionView
+                        Grid.Row="4"
+                        ItemsSource="{Binding Rounds}"
+                        x:Name="MobileRoundsList">
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+
+                                <Border
+                                    BackgroundColor="{StaticResource BackgroundWhite}"
+                                    Stroke="#DFE8DE"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="15"
+                                    Margin="0,5">
+
+                                    <Grid ColumnDefinitions="*,Auto">
+
+                                        <VerticalStackLayout Spacing="5">
+
+                                            <Label
+                                                Text="{Binding CourseName}"
+                                                FontSize="18"
+                                                FontAttributes="Bold"
+                                                TextColor="{StaticResource PrimaryGreen}" />
+
+                                            <Label
+                                                Text="{Binding Date, StringFormat='{0:MMM d, yyyy}'}"
+                                                TextColor="{StaticResource TextMuted}" />
+
+                                            <Label
+                                                Text="{Binding NumberOfHoles, StringFormat='{0} holes'}"
+                                                TextColor="{StaticResource TextMuted}" />
+
+                                        </VerticalStackLayout>
+
+                                        <Label
+                                            Grid.Column="1"
+                                            Text="{Binding TotalStrokes}"
+                                            FontSize="24"
+                                            FontAttributes="Bold"
+                                            TextColor="{StaticResource PrimaryGreen}"
+                                            VerticalOptions="Center" />
+
+                                    </Grid>
+
+                                </Border>
+
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+
+                    </CollectionView>
+
+                </Grid>
 
             </VerticalStackLayout>
-
         </ScrollView>
-
     </Grid>
 
 </ContentPage>
