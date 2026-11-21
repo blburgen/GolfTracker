@@ -666,43 +666,19 @@ public partial class Scorecard : ContentPage, IQueryAttributable
                 IsCompleted = isCompleted
             };
 
-            // Insert or update the Round in SQLite (populates round.ID on insert)
-            await _database.SaveRoundAsync(round);
-            _savedRoundId = round.ID;
+            var scoresToSave = new List<HoleScore>();
+            for (int i = 0; i < numberOfHoles; i++)
+            {
+                scoresToSave.Add(new HoleScore
+                {
+                    HoleNumber = i + 1,
+                    Par = holePars?[i],
+                    Strokes = holeStrokes[i]
+                });
+            }
 
-            // Remove any previously saved holes for this round if the user clicks Save twice
-            var existingHoles = await _database.GetHoleScoresForRoundAsync(round.ID);
-            if (existingHoles.Count > 0)
-            {
-                for (int i = 0; i < numberOfHoles; i++)
-                {
-                    var match = existingHoles.FirstOrDefault(h => h.HoleNumber == i + 1);
-                    var holeScore = new HoleScore
-                    {
-                        ID = match?.ID ?? 0,
-                        RoundID = round.ID,
-                        HoleNumber = i + 1,
-                        Par = holePars?[i],
-                        Strokes = holeStrokes[i]
-                    };
-                    await _database.SaveHoleScoreAsync(holeScore);
-                }
-            }
-            else
-            {
-                var scoresToSave = new List<HoleScore>();
-                for (int i = 0; i < numberOfHoles; i++)
-                {
-                    scoresToSave.Add(new HoleScore
-                    {
-                        RoundID = round.ID,
-                        HoleNumber = i + 1,
-                        Par = holePars?[i],
-                        Strokes = holeStrokes[i]
-                    });
-                }
-                await _database.SaveAllHoleScoresAsync(scoresToSave);
-            }
+            await _database.SaveRoundWithHoleScoresAsync(round, scoresToSave);
+            _savedRoundId = round.ID;
 
             await DisplayAlertAsync(
                 "Round Saved",

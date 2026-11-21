@@ -106,6 +106,41 @@ public class GolfDatabase
         return round.ID != 0 ? await _database!.UpdateAsync(round) : await _database!.InsertAsync(round);
     }
 
+    public async Task SaveRoundWithHoleScoresAsync(Round round, IEnumerable<HoleScore> holeScores)
+    {
+        await Init();
+        round.NeedsSync = true;
+        round.LastModifiedUtc = DateTime.UtcNow;
+        var scores = holeScores.ToList();
+
+        await _database!.RunInTransactionAsync(connection =>
+        {
+            if (round.ID != 0)
+                connection.Update(round);
+            else
+                connection.Insert(round);
+
+            var existingHoles = connection.Table<HoleScore>()
+                .Where(h => h.RoundID == round.ID)
+                .ToList();
+
+            foreach (var holeScore in scores)
+            {
+                holeScore.RoundID = round.ID;
+                var existingHole = existingHoles.FirstOrDefault(h => h.HoleNumber == holeScore.HoleNumber);
+                if (existingHole is not null)
+                {
+                    holeScore.ID = existingHole.ID;
+                    connection.Update(holeScore);
+                }
+                else
+                {
+                    connection.Insert(holeScore);
+                }
+            }
+        });
+    }
+
     public async Task<int> DeleteRoundAsync(Round round)
     {
         await Init();
