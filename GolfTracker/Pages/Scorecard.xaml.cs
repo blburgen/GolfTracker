@@ -1,8 +1,15 @@
+using GolfTracker.Data;
+using GolfTracker.Models;
+
 using GolfTracker.Services;
 namespace GolfTracker.Pages;
 
 public partial class Scorecard : ContentPage, IQueryAttributable
 {
+    private readonly GolfDatabase _database;
+    private int? _savedRoundId;
+    private bool _isSaving;
+
     private int numberOfHoles;
     private int currentHole = 1;
     private int?[] holeStrokes = Array.Empty<int?>();
@@ -14,14 +21,15 @@ public partial class Scorecard : ContentPage, IQueryAttributable
     private DateTime roundDate;
     private bool roundSaved = false;
 
-    public Scorecard()
+    public Scorecard(GolfDatabase database)
     {
         InitializeComponent();
+        _database = database;
 
-    #if WINDOWS
+#if WINDOWS
         Loaded += OnScorecardLoaded;
         Unloaded += OnScorecardUnloaded;
-    #endif
+#endif
     }
 
     private void OnPageSizeChanged(object? sender, EventArgs e)
@@ -36,6 +44,7 @@ public partial class Scorecard : ContentPage, IQueryAttributable
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
+        _savedRoundId = null;
         roundSaved = false;
         roundCourseName = query["CourseName"]?.ToString() ?? "";
         roundCourseType = query["CourseType"]?.ToString() ?? "";
@@ -165,7 +174,7 @@ public partial class Scorecard : ContentPage, IQueryAttributable
         UpdateDesktopHoleTable();
         UpdateMobileHoleTable();
     }
- private void UpdateMobileHoleTable()
+    private void UpdateMobileHoleTable()
     {
         MobileHoleRows.Children.Clear();
 
@@ -484,13 +493,13 @@ public partial class Scorecard : ContentPage, IQueryAttributable
             -3 => "Albatross",
             -2 => "Eagle",
             -1 => "Birdie",
-             0 => "Par",
-             1 => "Bogey",
-             2 => "Double Bogey",
-             3 => "Triple Bogey",
-             _ => difference > 0
-                ? $"+{difference} Over Par"
-                : $"{difference} Under Par"
+            0 => "Par",
+            1 => "Bogey",
+            2 => "Double Bogey",
+            3 => "Triple Bogey",
+            _ => difference > 0
+               ? $"+{difference} Over Par"
+               : $"{difference} Under Par"
         };
     }
 
@@ -552,7 +561,7 @@ public partial class Scorecard : ContentPage, IQueryAttributable
     // --------------------------------------------------
     // ROUND COMPLETE POPUP
     // --------------------------------------------------
-    
+
     private async void OnFinishRoundClicked(object? sender, EventArgs e)
     {
         if (numberOfHoles <= 0 ||
@@ -594,7 +603,7 @@ public partial class Scorecard : ContentPage, IQueryAttributable
         SaveRound(false);
     }
 
-     private async void OnFinishEarlyClicked(object? sender, EventArgs e)
+    private async void OnFinishEarlyClicked(object? sender, EventArgs e)
     {
 
         int totalStrokes = holeStrokes.Sum(strokes => strokes ?? 0);
@@ -632,6 +641,7 @@ public partial class Scorecard : ContentPage, IQueryAttributable
 
     private async void OnStartNewRoundClicked(object? sender, EventArgs e)
     {
+        _savedRoundId = null;
         RoundCompleteOverlay.IsVisible = false;
 
         await Shell.Current.GoToAsync("//NewGame");
@@ -647,18 +657,66 @@ public partial class Scorecard : ContentPage, IQueryAttributable
 
     private async void OnSignInToSaveClicked(object? sender, EventArgs e)
     {
-        // Sign-in saving has not been connected yet.
-        // Keep the user on this page so their scores aren't lost.
-        await DisplayAlertAsync(
-            "Saving Not Connected Yet",
-            "Your round is complete, but sign-in saving has not been connected yet. " +
-            "You can review your scorecard or start a new round. " +
-            "The round is not saved to History.",
-            "OK");
+        if (_isSaving)
+            return;
+
+        _isSaving = true;
+        SaveRoundButton.IsEnabled = false;
+
+        try
+        {
+            bool isCompleted = numberOfHoles > 0 && holeStrokes.All(s => s.HasValue);
+
+            var round = new Round
+            {
+                ID = _savedRoundId ?? 0,
+                CourseName = roundCourseName,
+                CourseType = roundCourseType,
+                DatePlayed = roundDate,
+                NumberOfHoles = numberOfHoles,
+                TotalStrokes = holeStrokes.Sum(s => s ?? 0),
+                TotalPar = holePars?.Sum(),
+                IsCompleted = isCompleted
+            };
+
+            var scoresToSave = new List<HoleScore>();
+            for (int i = 0; i < numberOfHoles; i++)
+            {
+                scoresToSave.Add(new HoleScore
+                {
+                    HoleNumber = i + 1,
+                    Par = holePars?[i],
+                    Strokes = holeStrokes[i]
+                });
+            }
+
+            await _database.SaveRoundWithHoleScoresAsync(round, scoresToSave);
+            _savedRoundId = round.ID;
+
+            await DisplayAlertAsync(
+                "Round Saved",
+                $"Your round at {roundCourseName} has been saved locally to History.",
+                "OK");
+
+            RoundCompleteOverlay.IsVisible = false;
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync(
+                "Save Failed",
+                $"Could not save your round: {ex.Message}",
+                "OK");
+        }
+        finally
+        {
+            SaveRoundButton.IsEnabled = true;
+            _isSaving = false;
+        }
     }
 
 
-   
+
+
 
 #if WINDOWS
 private Microsoft.UI.Xaml.UIElement? keyboardElement;
