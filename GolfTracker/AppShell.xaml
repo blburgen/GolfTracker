@@ -22,7 +22,8 @@
         Title="New Game"
         ContentTemplate="{DataTemplate pages:NewGame}"
         Route="NewGame" />
-
+    
+    <!-- Hidden until Microsoft Authentication successeds -->
     <ShellContent
         Title="History"
         ContentTemplate="{DataTemplate pages:History}"

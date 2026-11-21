@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:GolfTracker.Controls"
     x:Class="GolfTracker.Pages.SignIn"
-    Title="SignIn"
+    Title="Sign In"
     BackgroundColor="{StaticResource BackgroundWhite}">
 
     <Grid RowDefinitions="Auto,*">
@@ -13,19 +13,63 @@
         <controls:NavigationHeader
             Grid.Row="0" />
 
-        <!-- SignIn page content -->
-        <ScrollView Grid.Row="1">
+        <!-- Sign In page content -->
+        <ScrollView
+            Grid.Row="1"
+            BackgroundColor="{StaticResource BackgroundWhite}">
 
             <VerticalStackLayout
                 Padding="24"
                 Spacing="20"
                 VerticalOptions="Center">
 
+                <!-- Main heading -->
                 <Label
-                    Text="Sign In Tab Placeholder"
-                    FontSize="28"
+                    Text="Welcome to GolfTracker!"
+                    FontSize="32"
                     FontAttributes="Bold"
                     TextColor="{StaticResource PrimaryGreen}"
+                    HorizontalTextAlignment="Center" />
+
+                <!-- Subtitle -->
+                <Label
+                    Text="Sign in with your Microsoft account to connect OneDrive and sync your golf scores across devices."
+                    FontSize="16"
+                    TextColor="{StaticResource TextMuted}"
+                    HorizontalTextAlignment="Center" />
+
+                <!-- Decorative accent -->
+                <BoxView
+                    Color="{StaticResource AccentGold}"
+                    WidthRequest="60"
+                    HeightRequest="3"
+                    HorizontalOptions="Center" />
+
+                <!-- Microsoft Sign In button -->
+                <Button
+                    Text="Sign in with Microsoft"
+                    BackgroundColor="{StaticResource PrimaryGreen}"
+                    TextColor="White"
+                    FontSize="16"
+                    FontAttributes="Bold"
+                    HeightRequest="50"
+                    CornerRadius="10"
+                    Clicked="OnMicrosoftSignInClicked" />
+
+                <!-- Guest Mode button -->
+                <Button
+                    Text="Continue without signing in"
+                    BackgroundColor="Transparent"
+                    TextColor="{StaticResource PrimaryGreen}"
+                    FontSize="16"
+                    HeightRequest="50"
+                    Clicked="OnContinueClicked" />
+
+                <!-- Guest mode explanation -->
+                <Label
+                    Text="You can track your golf games without signing in. OneDrive synchronization will be unavailable in guest mode."
+                    FontSize="13"
+                    TextColor="{StaticResource TextMuted}"
                     HorizontalTextAlignment="Center" />
 
             </VerticalStackLayout>
