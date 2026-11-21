@@ -18,4 +18,7 @@ public class Course
     public int HoleCount { get; set; } = 18;
 
     public int TotalPar { get; set; }
+
+    public bool NeedsSync { get; set; } = true;
+    public DateTime LastModifiedUtc { get; set; } = DateTime.UtcNow;
 }
