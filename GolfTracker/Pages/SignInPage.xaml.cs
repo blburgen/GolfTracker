@@ -1,33 +1,56 @@
 
 using Microsoft.Maui.Storage;
+using GolfTracker.Services;
+using Microsoft.Identity.Client;
 
 namespace GolfTracker.Pages;
 
 public partial class SignIn : ContentPage
 {
+    private readonly MicrosoftAuthService _authService = new();
+
     public SignIn()
     {
         InitializeComponent();
     }
 
-    // Microsoft / OneDrive sign-in
     private async void OnMicrosoftSignInClicked(
-        object sender, EventArgs e)
+        object? sender, EventArgs e)
     {
-        await DisplayAlertAsync(
-            "Microsoft Sign In",
-            "Microsoft authentication is not configured yet.",
-            "OK");
+        try
+        {
+            var result = await _authService.SignInAsync();
+
+            Preferences.Default.Set("GuestMode", false);
+
+            await DisplayAlertAsync(
+                "Signed In",
+                $"Welcome, {result.Account.Username}!",
+                "OK");
+
+            await Shell.Current.GoToAsync("//WelcomePage");
+        }
+        catch (MsalException ex)
+        {
+            await DisplayAlertAsync(
+                "Microsoft Sign In Error",
+                ex.Message,
+                "OK");
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync(
+                "Error",
+                ex.Message,
+                "OK");
+        }
     }
 
-    // Continue using GolfTracker without signing in
     private async void OnContinueClicked(
-        object sender, EventArgs e)
+        object? sender, EventArgs e)
     {
-        // Save guest mode preference
         Preferences.Default.Set("GuestMode", true);
 
-        // Navigate to the Welcome page
         await Shell.Current.GoToAsync("//WelcomePage");
     }
 }
