@@ -1,10 +1,11 @@
 
 namespace GolfTracker.Pages;
+
 using GolfTracker.Services;
 
 public partial class History : ContentPage
 {
-    public History() 
+    public History()
     {
         InitializeComponent();
         UpdateHistoryStats();
@@ -30,10 +31,28 @@ public partial class History : ContentPage
     }
 
     private List<GolfRound> rounds = new();
-    protected override void OnAppearing()
+    protected async override void OnAppearing()
     {
         base.OnAppearing();
         LoadRounds();
+        // Wait for Microsoft session restoration to finish.
+        if (Shell.Current is AppShell appShell)
+        {
+            await appShell.WaitForSessionRestoreAsync();
+        }
+
+        // Check if the user is signed in.
+        bool isGuest = Preferences.Default.Get("GuestMode", true);
+
+        if (isGuest)
+        {
+            await DisplayAlertAsync(
+                "Sign In Required",
+                "Please sign in with Microsoft to view your game history.",
+                "OK");
+
+            await Shell.Current.GoToAsync("//SignIn");
+        }
     }
 
     private void LoadRounds()
@@ -105,31 +124,5 @@ public partial class History : ContentPage
 
         DesktopRoundsList.ItemsSource = sortedRounds;
         MobileRoundsList.ItemsSource = sortedRounds;
-    }
-
-
-}
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
-
-        // Wait for Microsoft session restoration to finish.
-        if (Shell.Current is AppShell appShell)
-        {
-            await appShell.WaitForSessionRestoreAsync();
-        }
-
-        // Check if the user is signed in.
-        bool isGuest = Preferences.Default.Get("GuestMode", true);
-
-        if (isGuest)
-        {
-            await DisplayAlertAsync(
-                "Sign In Required",
-                "Please sign in with Microsoft to view your game history.",
-                "OK");
-
-            await Shell.Current.GoToAsync("//SignIn");
-        }
     }
 }
