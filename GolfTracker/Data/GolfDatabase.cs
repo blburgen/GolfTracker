@@ -17,6 +17,7 @@ public class GolfDatabase
         await _database.CreateTableAsync<Course>();
         await _database.CreateTableAsync<Round>();
         await _database.CreateTableAsync<HoleScore>();
+
     }
 
     // ==================== COURSE METHODS ====================
@@ -68,11 +69,11 @@ public class GolfDatabase
             .ToListAsync();
     }
 
-    public async Task<List<Round>> GetRoundsForCourseAsync(int courseId)
+    public async Task<List<Round>> GetRoundsForCourseAsync(string courseName)
     {
         await Init();
         return await _database!.Table<Round>()
-            .Where(r => r.CourseID == courseId)
+            .Where(r => r.CourseName == courseName)
             .OrderByDescending(r => r.DatePlayed)
             .ToListAsync();
     }
@@ -88,10 +89,9 @@ public class GolfDatabase
     public async Task<int> SaveRoundAsync(Round round)
     {
         await Init();
-        if (round.ID != 0)
-            return await _database!.UpdateAsync(round);
-        else
-            return await _database!.InsertAsync(round);
+        round.NeedsSync = true;
+        round.LastModifiedUtc = DateTime.UtcNow;
+        return round.ID != 0 ? await _database!.UpdateAsync(round) : await _database!.InsertAsync(round);
     }
 
     public async Task<int> DeleteRoundAsync(Round round)
@@ -137,5 +137,20 @@ public class GolfDatabase
             else
                 await _database!.InsertAsync(hole);
         }
+    }
+    // 
+    public async Task<List<Round>> GetUnsyncedRoundsAsync()
+    {
+        await Init();
+        return await _database!.Table<Round>()
+            .Where(r => r.NeedsSync)
+            .ToListAsync();
+    }
+
+    public async Task MarkRoundSyncedAsync(Round round)
+    {
+        await Init();
+        round.NeedsSync = false;
+        await _database!.UpdateAsync(round);
     }
 }

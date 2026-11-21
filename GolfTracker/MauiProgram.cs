@@ -3,6 +3,7 @@ using System.Reflection;
 using dotenv.net;
 using GolfTracker.Data;
 using GolfTracker.Pages;
+using GolfTracker.Services;
 
 namespace GolfTracker;
 
@@ -24,10 +25,13 @@ public static class MauiProgram
 		// Register the SQLite database service as a singleton
 		builder.Services.AddSingleton<GolfDatabase>();
 
+		// Register SyncService right after GolfDatabase
+		builder.Services.AddSingleton<SyncService>();
+
 		// Register your pages here so GolfDatabase can be injected into them
 		// Example:
 		// builder.Services.AddSingleton<MainPage>();
-		
+
 		// Register pages that inject GolfDatabase
 		builder.Services.AddTransient<Scorecard>();
 
