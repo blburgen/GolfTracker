@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Reflection;
 using dotenv.net;
+using GolfTracker.Data;
+using GolfTracker.Pages;
 
 namespace GolfTracker;
 
@@ -18,6 +20,16 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			});
+
+		// Register the SQLite database service as a singleton
+		builder.Services.AddSingleton<GolfDatabase>();
+
+		// Register your pages here so GolfDatabase can be injected into them
+		// Example:
+		// builder.Services.AddSingleton<MainPage>();
+		
+		// Register pages that inject GolfDatabase
+		builder.Services.AddTransient<Scorecard>();
 
 #if DEBUG
 		builder.Logging.AddDebug();
