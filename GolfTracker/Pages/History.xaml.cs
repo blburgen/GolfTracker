@@ -97,6 +97,11 @@ public partial class History : ContentPage
             _ => rounds.OrderByDescending(r => r.Date).ToList()
         };
 
+        if (DesktopRoundSortPicker.SelectedIndex != picker.SelectedIndex)
+            DesktopRoundSortPicker.SelectedIndex = picker.SelectedIndex;
+        if (MobileRoundSortPicker.SelectedIndex != picker.SelectedIndex)
+            MobileRoundSortPicker.SelectedIndex = picker.SelectedIndex;
+
         DesktopRoundsList.ItemsSource = sortedRounds;
         MobileRoundsList.ItemsSource = sortedRounds;
     }
