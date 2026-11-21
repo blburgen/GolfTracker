@@ -35,7 +35,7 @@
                 <Label
                     Text="Sign in with your Microsoft account to connect OneDrive and sync your golf scores across devices."
                     FontSize="16"
-                    TextColor="{StaticResource TextMuted}"
+                    TextColor="{StaticResource TextDark}"
                     HorizontalTextAlignment="Center" />
 
                 <!-- Decorative accent -->
@@ -69,7 +69,7 @@
                 <Label
                     Text="You can track your golf games without signing in. OneDrive synchronization will be unavailable in guest mode."
                     FontSize="13"
-                    TextColor="{StaticResource TextMuted}"
+                    TextColor="{StaticResource TextDark}"
                     HorizontalTextAlignment="Center" />
 
             </VerticalStackLayout>
