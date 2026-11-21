@@ -12,7 +12,13 @@ public partial class History : ContentPage
     {
         base.OnAppearing();
 
-        // Check if the user is signed in
+        // Wait for Microsoft session restoration to finish.
+        if (Shell.Current is AppShell appShell)
+        {
+            await appShell.WaitForSessionRestoreAsync();
+        }
+
+        // Check if the user is signed in.
         bool isGuest = Preferences.Default.Get("GuestMode", true);
 
         if (isGuest)
