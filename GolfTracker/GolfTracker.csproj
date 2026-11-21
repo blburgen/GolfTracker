@@ -70,6 +70,7 @@
 		<PackageReference Include="dotenv.net" Version="4.2.0" />
 		<PackageReference Include="Microsoft.Graph" Version="6.10.0" />
 		<PackageReference Include="Microsoft.Identity.Client" Version="4.92.0" />
+		<PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" Version="4.92.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.11.285" />

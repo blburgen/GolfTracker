@@ -1,6 +1,7 @@
 using GolfTracker.Data;
 using GolfTracker.Models;
 
+using GolfTracker.Services;
 namespace GolfTracker.Pages;
 
 public partial class Scorecard : ContentPage, IQueryAttributable
@@ -18,6 +19,7 @@ public partial class Scorecard : ContentPage, IQueryAttributable
     private string roundCourseName = "";
     private string roundCourseType = "";
     private DateTime roundDate;
+    private bool roundSaved = false;
 
     public Scorecard(GolfDatabase database)
     {
@@ -43,6 +45,7 @@ public partial class Scorecard : ContentPage, IQueryAttributable
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         _savedRoundId = null;
+        roundSaved = false;
         roundCourseName = query["CourseName"]?.ToString() ?? "";
         roundCourseType = query["CourseType"]?.ToString() ?? "";
         roundDate = (DateTime)query["Date"];
@@ -597,6 +600,7 @@ public partial class Scorecard : ContentPage, IQueryAttributable
         }
 
         RoundCompleteOverlay.IsVisible = true;
+        SaveRound(false);
     }
 
     private async void OnFinishEarlyClicked(object? sender, EventArgs e)
@@ -627,6 +631,7 @@ public partial class Scorecard : ContentPage, IQueryAttributable
         }
 
         RoundCompleteOverlay.IsVisible = true;
+        SaveRound(true);
     }
 
     private void OnReviewScorecardClicked(object? sender, EventArgs e)
@@ -641,6 +646,14 @@ public partial class Scorecard : ContentPage, IQueryAttributable
 
         await Shell.Current.GoToAsync("//NewGame");
     }
+
+    private async void OnHistoryClicked(object? sender, EventArgs e)
+    {
+        RoundCompleteOverlay.IsVisible = false;
+
+        await Shell.Current.GoToAsync("//History");
+    }
+
 
     private async void OnSignInToSaveClicked(object? sender, EventArgs e)
     {
@@ -739,6 +752,35 @@ private void OnScorecardUnloaded(object? sender, EventArgs e)
     keyboardElement = null;
     keyboardHandler = null;
 }
+
+
+private void SaveRound(bool endedEarly)
+{
+    if (roundSaved || numberOfHoles <= 0)
+        return;
+
+    GolfRound round = new GolfRound
+    {
+        CourseName = roundCourseName,
+        Date = roundDate,
+        CourseType = roundCourseType,
+
+        NumberOfHoles = numberOfHoles,
+        HolesCompleted = holeStrokes.Count(s => s.HasValue),
+        TotalStrokes = holeStrokes.Sum(s => s ?? 0),
+
+        EndedEarly = endedEarly,
+
+        HoleStrokes = holeStrokes.ToArray(),
+        HolePars = holePars?.ToArray()
+                   ?? Enumerable.Repeat(3, numberOfHoles).ToArray()
+    };
+
+    RoundHistoryService.Instance.AddRound(round);
+
+    roundSaved = true;
+}
+
 
 private void OnWindowsKeyDown(
     object sender,
