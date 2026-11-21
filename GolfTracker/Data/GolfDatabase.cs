@@ -6,18 +6,30 @@ namespace GolfTracker.Data;
 public class GolfDatabase
 {
     private SQLiteAsyncConnection? _database;
+    private readonly SemaphoreSlim _initLock = new(1, 1);
 
     private async Task Init()
     {
         if (_database is not null)
             return;
 
-        _database = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
+        await _initLock.WaitAsync();
+        try
+        {
+            if (_database is not null)
+                return;
 
-        await _database.CreateTableAsync<Course>();
-        await _database.CreateTableAsync<Round>();
-        await _database.CreateTableAsync<HoleScore>();
+            var db = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
+            await db.CreateTableAsync<Course>();
+            await db.CreateTableAsync<Round>();
+            await db.CreateTableAsync<HoleScore>();
 
+            _database = db;
+        }
+        finally
+        {
+            _initLock.Release();
+        }
     }
 
     // ==================== COURSE METHODS ====================

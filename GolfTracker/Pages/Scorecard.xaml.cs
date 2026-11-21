@@ -41,6 +41,7 @@ public partial class Scorecard : ContentPage, IQueryAttributable
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
+        _savedRoundId = null;
         roundCourseName = query["CourseName"]?.ToString() ?? "";
         roundCourseType = query["CourseType"]?.ToString() ?? "";
         roundDate = (DateTime)query["Date"];
@@ -634,6 +635,7 @@ public partial class Scorecard : ContentPage, IQueryAttributable
 
     private async void OnStartNewRoundClicked(object? sender, EventArgs e)
     {
+        _savedRoundId = null;
         RoundCompleteOverlay.IsVisible = false;
 
         await Shell.Current.GoToAsync("//NewGame");
