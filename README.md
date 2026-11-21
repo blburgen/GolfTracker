@@ -1,17 +1,19 @@
 # GolfTracker
-When golfing you want to keep track of the scoring you do for each course.  This can be the standard 9- and 18-hole courses, but you want to also track your short courses or putting courses also.  This project aims to create a cross-platform app that can be used by a golfer to track their progress.
 
+When golfing you want to keep track of the scoring you do for each course. This can be the standard 9- and 18-hole courses, but you want to also track your short courses or putting courses also. This project aims to create a cross-platform app that can be used by a golfer to track their progress.
 
 # Favorite Quote
+
 Brady Burgener - "Believe you can and you're halfway there." — Theodore Roosevelt
 
-Brandon Mount - "You may delay, but time will not." -- Benjamin Franklin 
+Brandon Mount - "You may delay, but time will not." -- Benjamin Franklin
 
 Garrett Peterson - "We have come from God, and inevitably the myths woven by us will also refelct a splintered fragment of the true light, the eternal truth that is with God" -- J.R.R. Tolkien
 
 Michael Akpan - “Great things are done by a series of small things brought together.” — Vincent van Gogh
 
-
 # To Test Locally in terminal
+
 1. go into GolfTracker folder
 2. dotnet run -f net10.0-windows10.0.19041.0 -p:TargetFrameworks=net10.0-windows10.0.19041.0
+   hi
