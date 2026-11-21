@@ -5,6 +5,8 @@ using Microsoft.Identity.Client;
 
 namespace GolfTracker.Pages;
 
+
+
 public partial class SignIn : ContentPage
 {
     private readonly MicrosoftAuthService _authService = new();
