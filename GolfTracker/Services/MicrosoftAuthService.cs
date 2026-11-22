@@ -14,11 +14,20 @@ public class MicrosoftAuthService
         "Files.ReadWrite"
     };
 
-    private static readonly IPublicClientApplication _app =
-        PublicClientApplicationBuilder
-            .Create(ClientId)
-            .WithAuthority("https://login.microsoftonline.com/common")
-            .Build();
+    private static IPublicClientApplication? _app;
+
+    private static IPublicClientApplication GetApp()
+    {
+        if (_app == null)
+        {
+            _app = PublicClientApplicationBuilder
+                .Create(ClientId)
+                .WithAuthority(AzureCloudInstance.AzurePublic, AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount)
+                .WithRedirectUri("http://localhost")
+                .Build();
+        }
+        return _app;
+    }
 
     // Initialize the Windows token cache only once.
     private static readonly Lazy<Task> _cacheInitialization =
@@ -31,10 +40,8 @@ public class MicrosoftAuthService
     private static async Task InitializeCacheAsync()
     {
 #if WINDOWS
-        var cacheDirectory = Path.Combine(
-            FileSystem.AppDataDirectory,
-            "MicrosoftAuth");
-
+        var baseDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var cacheDirectory = Path.Combine(baseDir, "GolfTracker", "MicrosoftAuth");
         Directory.CreateDirectory(cacheDirectory);
 
         var storageProperties =
@@ -43,10 +50,8 @@ public class MicrosoftAuthService
                 cacheDirectory)
             .Build();
 
-        var cacheHelper = await MsalCacheHelper.CreateAsync(
-            storageProperties);
-
-        cacheHelper.RegisterCache(_app.UserTokenCache);
+        var cacheHelper = await MsalCacheHelper.CreateAsync(storageProperties);
+        cacheHelper.RegisterCache(GetApp().UserTokenCache);
 #endif
     }
 
@@ -66,19 +71,11 @@ public class MicrosoftAuthService
         catch (MsalUiRequiredException)
         {
             return await _app
-                .AcquireTokenWithDeviceCode(Scopes, deviceCodeResult =>
-                {
-                    MainThread.BeginInvokeOnMainThread(async () =>
-                    {
-                        await Shell.Current.DisplayAlertAsync(
-                            "Microsoft Sign In",
-                            deviceCodeResult.Message,
-                            "OK");
-                    });
-
-                    return Task.CompletedTask;
-                })
-                .ExecuteAsync();
+                .AcquireTokenInteractive(Scopes)
+#if WINDOWS
+                .WithUseEmbeddedWebView(false) // Uses system browser on Windows
+#endif
+            .ExecuteAsync();
         }
     }
 
