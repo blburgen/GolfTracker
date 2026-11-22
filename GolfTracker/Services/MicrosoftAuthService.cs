@@ -11,7 +11,8 @@ public class MicrosoftAuthService
     private static readonly string[] Scopes =
     {
         "User.Read",
-        "Files.ReadWrite"
+        "Files.ReadWrite",
+        "Files.ReadWrite.AppFolder"
     };
 
     private static IPublicClientApplication? _app;
@@ -33,6 +34,12 @@ public class MicrosoftAuthService
             _app = builder.Build();
         }
         return _app;
+    }
+
+    public static async Task<IPublicClientApplication> GetSharedClientAsync()
+    {
+        await _cacheInitialization.Value;
+        return GetApp();
     }
 
 

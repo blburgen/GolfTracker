@@ -10,16 +10,14 @@ namespace GolfTracker.Services;
 public class SyncService : IDisposable
 {
     private readonly GolfDatabase _database;
-    private readonly IPublicClientApplication _pca;
     private readonly SemaphoreSlim _syncLock = new(1, 1);
     private readonly string[] _scopes = { "Files.ReadWrite.AppFolder" };
 
     private string RemoteFileName => Path.GetFileName(_database.DbPath);
 
-    public SyncService(GolfDatabase database, IPublicClientApplication pca)
+    public SyncService(GolfDatabase database)
     {
         _database = database;
-        _pca = pca;
         Connectivity.Current.ConnectivityChanged += OnConnectivityChanged;
     }
 
@@ -121,17 +119,7 @@ public class SyncService : IDisposable
 
     public async Task<bool> SignInAsync()
     {
-        try
-        {
-            var builder = _pca.AcquireTokenInteractive(_scopes);
-
-#if ANDROID
-            builder = builder.WithParentActivityOrWindow(Platform.CurrentActivity);
-#endif
-
-            var result = await builder.ExecuteAsync();
-            return result != null;
-        }
+        try { return (await MicrosoftAuthService.SignInAsync()) != null; }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"OneDrive sign-in failed: {ex.Message}");
@@ -165,21 +153,16 @@ public class SyncService : IDisposable
 
     private async Task<GraphServiceClient?> GetAuthenticatedGraphClientAsync()
     {
-        var accounts = await _pca.GetAccountsAsync();
-        var firstAccount = accounts.FirstOrDefault();
+        var pca = await MicrosoftAuthService.GetSharedClientAsync();
+        var firstAccount = (await pca.GetAccountsAsync()).FirstOrDefault();
         if (firstAccount == null) return null;
 
         try
         {
-            var authResult = await _pca.AcquireTokenSilent(_scopes, firstAccount).ExecuteAsync();
-            var tokenProvider = new StaticTokenProvider(authResult.AccessToken);
-            var authProvider = new BaseBearerTokenAuthenticationProvider(tokenProvider);
-            return new GraphServiceClient(authProvider);
+            var authResult = await pca.AcquireTokenSilent(_scopes, firstAccount).ExecuteAsync();
+            return new GraphServiceClient(new BaseBearerTokenAuthenticationProvider(new StaticTokenProvider(authResult.AccessToken)));
         }
-        catch (MsalUiRequiredException)
-        {
-            return null;
-        }
+        catch (MsalUiRequiredException) { return null; }
     }
 
     public void Dispose()
