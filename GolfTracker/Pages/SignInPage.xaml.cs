@@ -79,10 +79,11 @@ public partial class SignIn : ContentPage
         {
             if (currentAttempt == _signInAttempt)
             {
-                await DisplayAlertAsync(
-                    "Error",
-                    ex.Message,
-                    "OK");
+                var message = ex.InnerException != null
+                    ? $"{ex.Message}\n\nDetails: {ex.InnerException.Message}"
+                    : ex.Message;
+
+                await DisplayAlertAsync("Error", message, "OK");
             }
         }
         finally
@@ -108,4 +109,3 @@ public partial class SignIn : ContentPage
         await Shell.Current.GoToAsync("//WelcomePage");
     }
 }
- 
