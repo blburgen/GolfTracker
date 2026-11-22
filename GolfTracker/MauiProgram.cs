@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Client;
 using System.Reflection;
 using dotenv.net;
 using GolfTracker.Data;
@@ -22,18 +23,29 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			});
 
-		// Register the SQLite database service as a singleton
+		// 1. Register MSAL using the Client ID loaded from your .env file
+		var clientId = Environment.GetEnvironmentVariable("CLIENT_ID")
+					   ?? throw new InvalidOperationException("CLIENT_ID is missing from the .env file.");
+
+		var pcaBuilder = PublicClientApplicationBuilder.Create(clientId)
+			.WithRedirectUri($"msal{clientId}://auth")
+			.WithAuthority("https://login.microsoftonline.com/common");
+
+#if IOS
+		pcaBuilder = pcaBuilder.WithIosKeychainSecurityGroup("com.microsoft.adalcache");
+#endif
+
+		builder.Services.AddSingleton<IPublicClientApplication>(pcaBuilder.Build());
+
+		// 2. Register the SQLite database service as a singleton
 		builder.Services.AddSingleton<GolfDatabase>();
 
-		// Register SyncService right after GolfDatabase
+		// 3. Register SyncService right after GolfDatabase & MSAL
 		builder.Services.AddSingleton<SyncService>();
 
-		// Register your pages here so GolfDatabase can be injected into them
-		// Example:
-		// builder.Services.AddSingleton<MainPage>();
-
-		// Register pages that inject GolfDatabase
+		// Register pages that inject GolfDatabase / SyncService
 		builder.Services.AddTransient<Scorecard>();
+		builder.Services.AddTransient<History>();
 
 #if DEBUG
 		builder.Logging.AddDebug();

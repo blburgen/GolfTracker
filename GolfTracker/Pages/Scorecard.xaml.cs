@@ -7,6 +7,7 @@ namespace GolfTracker.Pages;
 public partial class Scorecard : ContentPage, IQueryAttributable
 {
     private readonly GolfDatabase _database;
+    private readonly SyncService _syncService;
     private int? _savedRoundId;
     private bool _isSaving;
 
@@ -21,10 +22,11 @@ public partial class Scorecard : ContentPage, IQueryAttributable
     private DateTime roundDate;
     private bool roundSaved = false;
 
-    public Scorecard(GolfDatabase database)
+    public Scorecard(GolfDatabase database, SyncService syncService)
     {
         InitializeComponent();
         _database = database;
+        _syncService = syncService;
 
 #if WINDOWS
         Loaded += OnScorecardLoaded;
@@ -600,7 +602,7 @@ public partial class Scorecard : ContentPage, IQueryAttributable
         }
 
         RoundCompleteOverlay.IsVisible = true;
-        SaveRound(false);
+        await SaveRoundAsync(false);
     }
 
     private async void OnFinishEarlyClicked(object? sender, EventArgs e)
@@ -631,7 +633,7 @@ public partial class Scorecard : ContentPage, IQueryAttributable
         }
 
         RoundCompleteOverlay.IsVisible = true;
-        SaveRound(true);
+        await SaveRoundAsync(true);
     }
 
     private void OnReviewScorecardClicked(object? sender, EventArgs e)
@@ -657,15 +659,44 @@ public partial class Scorecard : ContentPage, IQueryAttributable
 
     private async void OnSignInToSaveClicked(object? sender, EventArgs e)
     {
-        if (_isSaving)
+        SaveRoundButton.IsEnabled = false;
+        try
+        {
+            // Ensure the latest strokes/pars are saved to SQLite first
+            await SaveRoundAsync(endedEarly: !holeStrokes.All(s => s.HasValue));
+
+            bool synced = await _syncService.TriggerSyncAsync();
+            if (!synced && Connectivity.Current.NetworkAccess == NetworkAccess.Internet)
+            {
+                if (await _syncService.SignInAsync())
+                {
+                    synced = await _syncService.TriggerSyncAsync();
+                }
+            }
+
+            string statusMessage = synced
+                ? $"Your round at {roundCourseName} has been saved and synced to OneDrive!"
+                : $"Your round at {roundCourseName} is saved locally and will sync to OneDrive automatically when online.";
+
+            await DisplayAlertAsync("Round Saved", statusMessage, "OK");
+            RoundCompleteOverlay.IsVisible = false;
+        }
+        finally
+        {
+            SaveRoundButton.IsEnabled = true;
+        }
+    }
+
+
+    private async Task SaveRoundAsync(bool endedEarly)
+    {
+        if (_isSaving || numberOfHoles <= 0)
             return;
 
         _isSaving = true;
-        SaveRoundButton.IsEnabled = false;
-
         try
         {
-            bool isCompleted = numberOfHoles > 0 && holeStrokes.All(s => s.HasValue);
+            bool isCompleted = !endedEarly && holeStrokes.All(s => s.HasValue);
 
             var round = new Round
             {
@@ -692,54 +723,21 @@ public partial class Scorecard : ContentPage, IQueryAttributable
 
             await _database.SaveRoundWithHoleScoresAsync(round, scoresToSave);
             _savedRoundId = round.ID;
+            roundSaved = true;
 
-            await DisplayAlertAsync(
-                "Round Saved",
-                $"Your round at {roundCourseName} has been saved locally to History.",
-                "OK");
-
-            RoundCompleteOverlay.IsVisible = false;
+            // Automatically push the updated SQLite file to OneDrive in the background
+            _ = _syncService.TriggerSyncAsync();
         }
         catch (Exception ex)
         {
-            await DisplayAlertAsync(
-                "Save Failed",
-                $"Could not save your round: {ex.Message}",
-                "OK");
+            System.Diagnostics.Debug.WriteLine($"Auto-save failed: {ex.Message}");
         }
         finally
         {
-            SaveRoundButton.IsEnabled = true;
             _isSaving = false;
         }
     }
 
-    private void SaveRound(bool endedEarly)
-    {
-        if (roundSaved || numberOfHoles <= 0)
-            return;
-
-        GolfRound round = new GolfRound
-        {
-            CourseName = roundCourseName,
-            Date = roundDate,
-            CourseType = roundCourseType,
-
-            NumberOfHoles = numberOfHoles,
-            HolesCompleted = holeStrokes.Count(s => s.HasValue),
-            TotalStrokes = holeStrokes.Sum(s => s ?? 0),
-
-            EndedEarly = endedEarly,
-
-            HoleStrokes = holeStrokes.ToArray(),
-            HolePars = holePars?.ToArray()
-                       ?? Enumerable.Repeat(3, numberOfHoles).ToArray()
-        };
-
-        RoundHistoryService.Instance.AddRound(round);
-
-        roundSaved = true;
-    }
 
 #if WINDOWS
     private Microsoft.UI.Xaml.UIElement? keyboardElement;

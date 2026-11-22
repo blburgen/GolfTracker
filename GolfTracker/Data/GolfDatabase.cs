@@ -8,7 +8,11 @@ public class GolfDatabase
     private SQLiteAsyncConnection? _database;
     private readonly SemaphoreSlim _initLock = new(1, 1);
 
-    private async Task Init()
+    // Expose the path so SyncService knows which file to upload/download
+    public string DbPath => Constants.DatabasePath;
+
+
+    public async Task Init()
     {
         if (_database is not null)
             return;
@@ -25,6 +29,23 @@ public class GolfDatabase
             await db.CreateTableAsync<HoleScore>();
 
             _database = db;
+        }
+        finally
+        {
+            _initLock.Release();
+        }
+    }
+
+    public async Task CloseConnectionAsync()
+    {
+        await _initLock.WaitAsync();
+        try
+        {
+            if (_database is not null)
+            {
+                await _database.CloseAsync();
+                _database = null;
+            }
         }
         finally
         {
