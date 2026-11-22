@@ -714,107 +714,101 @@ public partial class Scorecard : ContentPage, IQueryAttributable
         }
     }
 
+    private void SaveRound(bool endedEarly)
+    {
+        if (roundSaved || numberOfHoles <= 0)
+            return;
 
+        GolfRound round = new GolfRound
+        {
+            CourseName = roundCourseName,
+            Date = roundDate,
+            CourseType = roundCourseType,
 
+            NumberOfHoles = numberOfHoles,
+            HolesCompleted = holeStrokes.Count(s => s.HasValue),
+            TotalStrokes = holeStrokes.Sum(s => s ?? 0),
 
+            EndedEarly = endedEarly,
+
+            HoleStrokes = holeStrokes.ToArray(),
+            HolePars = holePars?.ToArray()
+                       ?? Enumerable.Repeat(3, numberOfHoles).ToArray()
+        };
+
+        RoundHistoryService.Instance.AddRound(round);
+
+        roundSaved = true;
+    }
 
 #if WINDOWS
-private Microsoft.UI.Xaml.UIElement? keyboardElement;
-private Microsoft.UI.Xaml.Input.KeyEventHandler? keyboardHandler;
+    private Microsoft.UI.Xaml.UIElement? keyboardElement;
+    private Microsoft.UI.Xaml.Input.KeyEventHandler? keyboardHandler;
 
-private void OnScorecardLoaded(object? sender, EventArgs e)
-{
-    if (Handler?.PlatformView is not Microsoft.UI.Xaml.UIElement element)
-        return;
-
-    keyboardElement =
-        element.XamlRoot?.Content as Microsoft.UI.Xaml.UIElement;
-
-    if (keyboardElement == null)
-        return;
-
-    keyboardHandler = OnWindowsKeyDown;
-
-    keyboardElement.AddHandler(
-        Microsoft.UI.Xaml.UIElement.KeyDownEvent,
-        keyboardHandler,
-        true);
-}
-private void OnScorecardUnloaded(object? sender, EventArgs e)
-{
-    if (keyboardElement != null && keyboardHandler != null)
+    private void OnScorecardLoaded(object? sender, EventArgs e)
     {
-        keyboardElement.RemoveHandler(
+        if (Handler?.PlatformView is not Microsoft.UI.Xaml.UIElement element)
+            return;
+
+        keyboardElement =
+            element.XamlRoot?.Content as Microsoft.UI.Xaml.UIElement;
+
+        if (keyboardElement == null)
+            return;
+
+        keyboardHandler = OnWindowsKeyDown;
+
+        keyboardElement.AddHandler(
             Microsoft.UI.Xaml.UIElement.KeyDownEvent,
-            keyboardHandler);
+            keyboardHandler,
+            true);
+    }
+    private void OnScorecardUnloaded(object? sender, EventArgs e)
+    {
+        if (keyboardElement != null && keyboardHandler != null)
+        {
+            keyboardElement.RemoveHandler(
+                Microsoft.UI.Xaml.UIElement.KeyDownEvent,
+                keyboardHandler);
+        }
+
+        keyboardElement = null;
+        keyboardHandler = null;
     }
 
-    keyboardElement = null;
-    keyboardHandler = null;
-}
-
-
-private void SaveRound(bool endedEarly)
-{
-    if (roundSaved || numberOfHoles <= 0)
-        return;
-
-    GolfRound round = new GolfRound
+    private void OnWindowsKeyDown(
+        object sender,
+        Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
     {
-        CourseName = roundCourseName,
-        Date = roundDate,
-        CourseType = roundCourseType,
+        if (numberOfHoles <= 0 || RoundCompleteOverlay.IsVisible)
+            return;
 
-        NumberOfHoles = numberOfHoles,
-        HolesCompleted = holeStrokes.Count(s => s.HasValue),
-        TotalStrokes = holeStrokes.Sum(s => s ?? 0),
+        // Don't intercept keys when typing in a text box
+        if (e.OriginalSource is Microsoft.UI.Xaml.Controls.TextBox)
+            return;
 
-        EndedEarly = endedEarly,
+        int strokes;
 
-        HoleStrokes = holeStrokes.ToArray(),
-        HolePars = holePars?.ToArray()
-                   ?? Enumerable.Repeat(3, numberOfHoles).ToArray()
-    };
+        if (e.Key >= Windows.System.VirtualKey.Number0 &&
+            e.Key <= Windows.System.VirtualKey.Number9)
+        {
+            strokes = (int)e.Key - (int)Windows.System.VirtualKey.Number0;
+        }
+        else if (e.Key >= Windows.System.VirtualKey.NumberPad0 &&
+                 e.Key <= Windows.System.VirtualKey.NumberPad9)
+        {
+            strokes = (int)e.Key - (int)Windows.System.VirtualKey.NumberPad0;
+        }
+        else
+        {
+            return;
+        }
 
-    RoundHistoryService.Instance.AddRound(round);
+        holeStrokes[currentHole - 1] = strokes == 0 ? null : strokes;
 
-    roundSaved = true;
-}
-
-
-private void OnWindowsKeyDown(
-    object sender,
-    Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
-{
-    if (numberOfHoles <= 0 || RoundCompleteOverlay.IsVisible)
-        return;
-
-    // Don't intercept keys when typing in a text box
-    if (e.OriginalSource is Microsoft.UI.Xaml.Controls.TextBox)
-        return;
-
-    int strokes;
-
-    if (e.Key >= Windows.System.VirtualKey.Number0 &&
-        e.Key <= Windows.System.VirtualKey.Number9)
-    {
-        strokes = (int)e.Key - (int)Windows.System.VirtualKey.Number0;
+        UpdateScorecard();
+        e.Handled = true;
     }
-    else if (e.Key >= Windows.System.VirtualKey.NumberPad0 &&
-             e.Key <= Windows.System.VirtualKey.NumberPad9)
-    {
-        strokes = (int)e.Key - (int)Windows.System.VirtualKey.NumberPad0;
-    }
-    else
-    {
-        return;
-    }
-
-    holeStrokes[currentHole - 1] = strokes == 0 ? null : strokes;
-
-    UpdateScorecard();
-    e.Handled = true;
-}
 #endif
 
 

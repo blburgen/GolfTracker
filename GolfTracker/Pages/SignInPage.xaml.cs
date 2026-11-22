@@ -40,7 +40,11 @@ public partial class SignIn : ContentPage
 
         try
         {
-            var result = await _authService.SignInAsync();
+            // Change this (instance call):
+            // var result = await _authService.SignInAsync();
+
+            // To this (static type call):
+            var result = await MicrosoftAuthService.SignInAsync();
 
             // Ignore an outdated or abandoned sign-in.
             if (currentAttempt != _signInAttempt)

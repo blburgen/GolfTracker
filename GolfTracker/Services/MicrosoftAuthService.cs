@@ -20,14 +20,21 @@ public class MicrosoftAuthService
     {
         if (_app == null)
         {
-            _app = PublicClientApplicationBuilder
+            var builder = PublicClientApplicationBuilder
                 .Create(ClientId)
-                .WithAuthority(AzureCloudInstance.AzurePublic, AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount)
-                .WithRedirectUri("http://localhost")
-                .Build();
+                .WithAuthority(AzureCloudInstance.AzurePublic, AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount);
+
+#if ANDROID || IOS
+        builder = builder.WithRedirectUri($"msal{ClientId}://auth");
+#else
+            builder = builder.WithRedirectUri("http://localhost");
+#endif
+
+            _app = builder.Build();
         }
         return _app;
     }
+
 
     // Initialize the Windows token cache only once.
     private static readonly Lazy<Task> _cacheInitialization =
@@ -55,27 +62,32 @@ public class MicrosoftAuthService
 #endif
     }
 
-    public async Task<AuthenticationResult> SignInAsync()
+    public static async Task<AuthenticationResult?> SignInAsync()
     {
-        // Ensure the persistent cache is ready first.
-        await _cacheInitialization.Value;
+        await InitializeCacheAsync();
 
-        var accounts = await _app.GetAccountsAsync();
+        var app = GetApp();
+        var accounts = await app.GetAccountsAsync();
+        var firstAccount = accounts.FirstOrDefault();
 
         try
         {
-            return await _app
-                .AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
+            return await app
+                .AcquireTokenSilent(Scopes, firstAccount)
                 .ExecuteAsync();
         }
         catch (MsalUiRequiredException)
         {
-            return await _app
-                .AcquireTokenInteractive(Scopes)
-#if WINDOWS
-                .WithUseEmbeddedWebView(false) // Uses system browser on Windows
+            // ---> PART 2 OF STEP 1 GOES HERE <---
+            var interactiveRequest = app.AcquireTokenInteractive(Scopes);
+
+#if ANDROID
+        interactiveRequest = interactiveRequest.WithParentActivityOrWindow(Platform.CurrentActivity);
+#elif WINDOWS
+            interactiveRequest = interactiveRequest.WithUseEmbeddedWebView(false);
 #endif
-            .ExecuteAsync();
+
+            return await interactiveRequest.ExecuteAsync();
         }
     }
 
