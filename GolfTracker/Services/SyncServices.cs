@@ -66,37 +66,36 @@ public class SyncService : IDisposable
                 // File doesn't exist on OneDrive yet
             }
 
+            // Check how many rounds exist locally before closing SQLite
+            int roundCount = (await _database.GetRoundsAsync()).Count;
+
             // Close SQLite connection to flush WAL files and release the lock
             await _database.CloseConnectionAsync();
 
             try
             {
-                bool localExists = File.Exists(_database.DbPath);
-                DateTimeOffset localLastWrite = localExists
-                    ? File.GetLastWriteTimeUtc(_database.DbPath)
-                    : DateTimeOffset.MinValue;
+                bool hasLocalFile = File.Exists(_database.DbPath);
+                bool hasCloudFile = remoteFile?.Id != null;
 
-                if (remoteFile == null && localExists)
+                if (!hasCloudFile && hasLocalFile && roundCount > 0)
                 {
                     await UploadDatabaseAsync(graphClient, appFolder);
                 }
-                else if (remoteFile != null && !localExists && remoteFile.Id != null)
+                else if (hasCloudFile && (!hasLocalFile || roundCount == 0))
                 {
-                    await DownloadDatabaseAsync(graphClient, appFolder, remoteFile.Id);
+                    await DownloadDatabaseAsync(graphClient, appFolder, remoteFile!.Id!);
                 }
-                else if (remoteFile != null && localExists && remoteFile.Id != null)
+                else if (hasCloudFile && hasLocalFile && roundCount > 0)
                 {
-                    var remoteLastWrite = remoteFile.LastModifiedDateTime ?? DateTimeOffset.MinValue;
+                    var localTime = File.GetLastWriteTimeUtc(_database.DbPath);
+                    var cloudTime = remoteFile!.LastModifiedDateTime ?? DateTimeOffset.MinValue;
 
-                    if (localLastWrite > remoteLastWrite.AddSeconds(5))
-                    {
+                    if (localTime > cloudTime.AddSeconds(5))
                         await UploadDatabaseAsync(graphClient, appFolder);
-                    }
-                    else if (remoteLastWrite > localLastWrite.AddSeconds(5))
-                    {
-                        await DownloadDatabaseAsync(graphClient, appFolder, remoteFile.Id);
-                    }
+                    else if (cloudTime > localTime.AddSeconds(5))
+                        await DownloadDatabaseAsync(graphClient, appFolder, remoteFile.Id!);
                 }
+
             }
             finally
             {
