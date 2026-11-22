@@ -197,7 +197,6 @@
 
                     <!-- Desktop previous rounds list -->
                     <CollectionView
-                        ItemsSource="{Binding Rounds}"
                         x:Name="DesktopRoundsList">
 
                         <CollectionView.ItemTemplate>
@@ -222,11 +221,11 @@
                                                 TextColor="{StaticResource PrimaryGreen}" />
 
                                             <Label
-                                                Text="{Binding Date, StringFormat='{0:MMM d, yyyy}'}"
+                                                Text="{Binding DatePlayed, StringFormat='{0:MMM d, yyyy}'}"
                                                 TextColor="{StaticResource TextMuted}" />
 
                                             <Label
-                                                Text="{Binding HolesCompleted, StringFormat='{0} holes completed'}"
+                                                Text="{Binding NumberOfHoles, StringFormat='{0} holes completed'}"
                                                 TextColor="{StaticResource TextMuted}" />
 
                                         </VerticalStackLayout>
@@ -253,7 +252,7 @@
                 <!-- MOBILE HISTORY -->
                 <Grid
                     x:Name="MobileHistory"
-                    RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                    RowDefinitions="Auto,Auto,Auto,Auto,*"
                     RowSpacing="20"
                     Padding="20"
                     MaximumWidthRequest="650"
@@ -425,7 +424,6 @@
                     <!-- Mobile previous rounds list -->
                     <CollectionView
                         Grid.Row="4"
-                        ItemsSource="{Binding Rounds}"
                         x:Name="MobileRoundsList">
 
                         <CollectionView.ItemTemplate>
@@ -450,7 +448,7 @@
                                                 TextColor="{StaticResource PrimaryGreen}" />
 
                                             <Label
-                                                Text="{Binding Date, StringFormat='{0:MMM d, yyyy}'}"
+                                                Text="{Binding DatePlayed, StringFormat='{0:MMM d, yyyy}'}"
                                                 TextColor="{StaticResource TextMuted}" />
 
                                             <Label
