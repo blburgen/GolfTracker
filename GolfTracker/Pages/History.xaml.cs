@@ -2,17 +2,18 @@
 namespace GolfTracker.Pages;
 
 using GolfTracker.Services;
+using GolfTracker.Data;
+using GolfTracker.Models;
 
 public partial class History : ContentPage
 {
-    public History()
+    private readonly GolfDatabase _database;
+    private List<Round> rounds = new();
+
+    public History(GolfDatabase database)
     {
         InitializeComponent();
-        UpdateHistoryStats();
-        DesktopRoundsList.ItemsSource = rounds;
-        MobileRoundsList.ItemsSource = rounds;
-        DesktopRoundSortPicker.SelectedIndex = 0;
-        MobileRoundSortPicker.SelectedIndex = 0;
+        _database = database;
     }
 
     private void OnPageSizeChanged(object? sender, EventArgs e)
@@ -30,11 +31,10 @@ public partial class History : ContentPage
         await Shell.Current.GoToAsync("//NewGame");
     }
 
-    private List<GolfRound> rounds = new();
     protected async override void OnAppearing()
     {
         base.OnAppearing();
-        LoadRounds();
+        await LoadRoundsAsync();
         // Wait for Microsoft session restoration to finish.
         if (Shell.Current is AppShell appShell)
         {
@@ -55,32 +55,30 @@ public partial class History : ContentPage
         }
     }
 
-    private void LoadRounds()
-    {
-        rounds = RoundHistoryService.Instance.Rounds.ToList();
+    private async Task LoadRoundsAsync()
+{
+    rounds = await _database.GetRoundsAsync();
+    UpdateHistoryStats();
 
-        UpdateHistoryStats();
+    var sortedRounds = rounds
+        .OrderByDescending(r => r.DatePlayed)
+        .ToList();
 
-        // Display newest rounds first
-        List<GolfRound> sortedRounds = rounds
-            .OrderByDescending(r => r.Date)
-            .ToList();
+    DesktopRoundsList.ItemsSource = sortedRounds;
+    MobileRoundsList.ItemsSource = sortedRounds;
 
-        DesktopRoundsList.ItemsSource = sortedRounds;
-        MobileRoundsList.ItemsSource = sortedRounds;
+    DesktopRoundSortPicker.SelectedIndex = 0;
+    MobileRoundSortPicker.SelectedIndex = 0;
+}
 
-        // Select the default sorting option
-        DesktopRoundSortPicker.SelectedIndex = 0;
-        MobileRoundSortPicker.SelectedIndex = 0;
-    }
 
 
     private void UpdateHistoryStats()
     {
         int total = rounds.Count;
 
-        List<GolfRound> scoredRounds = rounds
-            .Where(r => r.HolesCompleted > 0)
+        List<Round> scoredRounds = rounds
+            .Where(r => r.NumberOfHoles > 0)
             .ToList();
 
         double average = scoredRounds.Count > 0
@@ -106,15 +104,15 @@ public partial class History : ContentPage
         if (sender is not Picker picker)
             return;
 
-        List<GolfRound> sortedRounds = picker.SelectedIndex switch
+        List<Round> sortedRounds = picker.SelectedIndex switch
         {
-            0 => rounds.OrderByDescending(r => r.Date).ToList(),
-            1 => rounds.OrderBy(r => r.Date).ToList(),
+            0 => rounds.OrderByDescending(r => r.DatePlayed).ToList(),
+1 => rounds.OrderBy(r => r.DatePlayed).ToList(),
             2 => rounds.OrderBy(r => r.TotalStrokes).ToList(),
             3 => rounds.OrderByDescending(r => r.TotalStrokes).ToList(),
             4 => rounds.OrderBy(r => r.CourseName).ToList(),
             5 => rounds.OrderByDescending(r => r.CourseName).ToList(),
-            _ => rounds.OrderByDescending(r => r.Date).ToList()
+            _ => rounds.OrderByDescending(r => r.DatePlayed).ToList()
         };
 
         if (DesktopRoundSortPicker.SelectedIndex != picker.SelectedIndex)
