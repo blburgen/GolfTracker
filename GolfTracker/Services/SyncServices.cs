@@ -7,20 +7,30 @@ using Microsoft.Kiota.Abstractions.Authentication;
 
 namespace GolfTracker.Services;
 
+// Synchronizes the local SQLite database file with the 
+// user's OneDrive AppFolder via Microsoft Graph.
 public class SyncService : IDisposable
 {
     private readonly GolfDatabase _database;
+
+    // Prevents overlapping sync operations from running concurrently.
     private readonly SemaphoreSlim _syncLock = new(1, 1);
+
+    // Restricts OneDrive access strictly to this app's dedicated folder.
     private readonly string[] _scopes = { "Files.ReadWrite.AppFolder" };
 
     private string RemoteFileName => Path.GetFileName(_database.DbPath);
 
+    // Initializes the sync service and subscribes to device connectivity 
+    // changes for automatic background syncing.
     public SyncService(GolfDatabase database)
     {
         _database = database;
         Connectivity.Current.ConnectivityChanged += OnConnectivityChanged;
     }
 
+    // Automatically triggers a database sync 
+    // whenever internet access is restored.
     private async void OnConnectivityChanged(object? sender, ConnectivityChangedEventArgs e)
     {
         if (e.NetworkAccess == NetworkAccess.Internet)
@@ -29,11 +39,14 @@ public class SyncService : IDisposable
         }
     }
 
+    // Compares the local SQLite database against OneDrive and 
+    // uploads or downloads the newer version.
     public async Task<bool> TriggerSyncAsync()
     {
         if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
             return false;
 
+        // Skip immediately if another sync is already in progress
         if (!await _syncLock.WaitAsync(0))
             return false;
 
@@ -48,7 +61,6 @@ public class SyncService : IDisposable
 
             // 2. Access Special["approot"] through Drives[drive.Id]
             var appFolder = await graphClient.Drives[drive.Id].Special["approot"].GetAsync();
-            if (appFolder?.Id == null) return false;
 
             if (appFolder?.Id == null || appFolder.ParentReference?.DriveId == null)
                 return false;
@@ -77,14 +89,20 @@ public class SyncService : IDisposable
                 bool hasLocalFile = File.Exists(_database.DbPath);
                 bool hasCloudFile = remoteFile?.Id != null;
 
+                // Case 1: First-time upload when local data exists 
+                // but no backup is in OneDrive yet
                 if (!hasCloudFile && hasLocalFile && roundCount > 0)
                 {
                     await UploadDatabaseAsync(graphClient, appFolder);
                 }
+                // Case 2: Fresh install or empty local database—restore 
+                // from existing OneDrive backup
                 else if (hasCloudFile && (!hasLocalFile || roundCount == 0))
                 {
                     await DownloadDatabaseAsync(graphClient, appFolder, remoteFile!.Id!);
                 }
+                // Case 3: Both exist—resolve by timestamp using a 5-second buffer 
+                // to avoid clock-skew loops
                 else if (hasCloudFile && hasLocalFile && roundCount > 0)
                 {
                     var localTime = File.GetLastWriteTimeUtc(_database.DbPath);
@@ -116,6 +134,8 @@ public class SyncService : IDisposable
         }
     }
 
+    // Prompts the user to sign in interactively with 
+    // Microsoft to enable OneDrive sync.
     public async Task<bool> SignInAsync()
     {
         try { return (await MicrosoftAuthService.SignInAsync()) != null; }
@@ -126,6 +146,8 @@ public class SyncService : IDisposable
         }
     }
 
+    // Streams the local SQLite database file to the 
+    // user's OneDrive AppFolder.
     private async Task UploadDatabaseAsync(GraphServiceClient client, DriveItem appFolder)
     {
         using var fileStream = File.OpenRead(_database.DbPath);
@@ -136,6 +158,8 @@ public class SyncService : IDisposable
             .PutAsync(fileStream);
     }
 
+    // Downloads the remote database file from OneDrive and 
+    // overwrites the local SQLite file.
     private async Task DownloadDatabaseAsync(GraphServiceClient client, DriveItem appFolder, string itemId)
     {
         using var stream = await client.Drives[appFolder.ParentReference!.DriveId]
@@ -150,6 +174,8 @@ public class SyncService : IDisposable
         }
     }
 
+    // Silently acquires an MSAL access token for the cached account and 
+    // builds an authenticated Graph client.
     private async Task<GraphServiceClient?> GetAuthenticatedGraphClientAsync()
     {
         var pca = await MicrosoftAuthService.GetSharedClientAsync();
@@ -164,6 +190,7 @@ public class SyncService : IDisposable
         catch (MsalUiRequiredException) { return null; }
     }
 
+    // Unsubscribes from connectivity events and releases the sync semaphore.
     public void Dispose()
     {
         Connectivity.Current.ConnectivityChanged -= OnConnectivityChanged;
@@ -171,6 +198,8 @@ public class SyncService : IDisposable
     }
 }
 
+// Provides a pre-acquired bearer access token to 
+// Kiota's Microsoft Graph authentication pipeline.
 public class StaticTokenProvider : IAccessTokenProvider
 {
     private readonly string _token;
