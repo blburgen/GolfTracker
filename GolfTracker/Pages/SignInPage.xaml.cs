@@ -1,5 +1,3 @@
-
-using Microsoft.Maui.Storage;
 using GolfTracker.Services;
 using Microsoft.Identity.Client;
 
