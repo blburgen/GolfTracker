@@ -14,4 +14,6 @@ Michael Akpan - “Great things are done by a series of small things brought tog
 
 # To Test Locally in terminal
 1. go into GolfTracker folder
-2. dotnet run -f net10.0-windows10.0.19041.0 -p:TargetFrameworks=net10.0-windows10.0.19041.0
+2. make sure you have the .env file in the folder
+3. dotnet run
+4. choose your operating system (windows, android)
