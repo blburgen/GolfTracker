@@ -5,14 +5,17 @@ using Microsoft.Identity.Client;
 
 namespace GolfTracker.Pages;
 
-
-
+// Handles user authentication via Microsoft Entra 
+// (MSAL) or offline Guest Mode before navigating to 
+// the main app.
 public partial class SignIn : ContentPage
 {
-    private readonly MicrosoftAuthService _authService = new();
 
     // Track the current sign-in attempt.
     private int _signInAttempt = 0;
+
+    // Guards against double-taps on the Microsoft 
+    // Sign-In button while an auth prompt is active.
     private bool _isSigningIn = false;
 
     public SignIn()
@@ -20,6 +23,8 @@ public partial class SignIn : ContentPage
         InitializeComponent();
     }
 
+    // Invalidates any in-flight sign-in 
+    // attempts when the user navigates away from the page.
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
@@ -28,6 +33,8 @@ public partial class SignIn : ContentPage
         _signInAttempt++;
     }
 
+    // Initiates interactive Microsoft authentication, saves 
+    // session state, and navigates to the welcome screen.
     private async void OnMicrosoftSignInClicked(
         object? sender, EventArgs e)
     {
@@ -40,8 +47,6 @@ public partial class SignIn : ContentPage
 
         try
         {
-            // Change this (instance call):
-            // var result = await _authService.SignInAsync();
 
             // To this (static type call):
             var result = await MicrosoftAuthService.SignInAsync();
@@ -56,6 +61,8 @@ public partial class SignIn : ContentPage
                 appShell.CancelPendingSessionRestore();
             }
 
+            // Persist authenticated mode so future app 
+            // launches attempt silent session restoration
             Preferences.Default.Set("GuestMode", false);
 
             await DisplayAlertAsync(
@@ -69,6 +76,8 @@ public partial class SignIn : ContentPage
 
             await Shell.Current.GoToAsync("//WelcomePage");
         }
+        // Handle MSAL-specific errors (e.g., user canceled login, 
+        // network failure, or invalid tenant configuration)
         catch (MsalException ex)
         {
             if (currentAttempt == _signInAttempt)
@@ -79,6 +88,8 @@ public partial class SignIn : ContentPage
                     "OK");
             }
         }
+        // Catch-all for unexpected errors, surfacing 
+        // inner exception details when available
         catch (Exception ex)
         {
             if (currentAttempt == _signInAttempt)
@@ -96,6 +107,8 @@ public partial class SignIn : ContentPage
         }
     }
 
+    // Bypasses Microsoft authentication and 
+    // enters the app in offline Guest Mode.
     private async void OnContinueClicked(
         object? sender, EventArgs e)
     {
@@ -108,6 +121,8 @@ public partial class SignIn : ContentPage
             appShell.CancelPendingSessionRestore();
         }
 
+        // Persist guest preference to skip automatic 
+        // sign-in prompts on subsequent launches
         Preferences.Default.Set("GuestMode", true);
 
         await Shell.Current.GoToAsync("//WelcomePage");
