@@ -4,7 +4,8 @@ using System.Reflection;
 using GolfTracker.Data;
 using GolfTracker.Pages;
 using GolfTracker.Services;
-
+using LiveChartsCore.SkiaSharpView.Maui;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 namespace GolfTracker;
 
 // Configures and builds the cross-platform .NET MAUI 
@@ -24,6 +25,8 @@ public static class MauiProgram
 
 		var builder = MauiApp.CreateBuilder();
 		builder
+			.UseSkiaSharp()
+			.UseLiveCharts()
 			.UseMauiApp<App>()
 			.ConfigureFonts(fonts =>
 			{

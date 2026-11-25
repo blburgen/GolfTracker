@@ -2,6 +2,7 @@
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui"
     xmlns:controls="clr-namespace:GolfTracker.Controls"
     x:Class="GolfTracker.Pages.History"
     Title="History"
@@ -9,12 +10,17 @@
     SizeChanged="OnPageSizeChanged">
 
     <Grid RowDefinitions="Auto,*">
+
+        <!-- NAVIGATION HEADER -->
         <controls:NavigationHeader Grid.Row="0" />
 
         <ScrollView Grid.Row="1">
             <VerticalStackLayout Spacing="5">
 
+                <!-- ==================================== -->
                 <!-- DESKTOP HISTORY -->
+                <!-- ==================================== -->
+
                 <VerticalStackLayout
                     x:Name="DesktopHistory"
                     IsVisible="False"
@@ -23,10 +29,9 @@
 
                     <!-- Page heading -->
                     <Grid
-                        ColumnDefinitions="*,Auto"
+                        ColumnDefinitions="*,Auto,Auto"
                         ColumnSpacing="20">
 
-                        <!-- LEFT SIDE: Title and Subtitle -->
                         <VerticalStackLayout
                             Grid.Column="0"
                             Spacing="5"
@@ -46,7 +51,7 @@
 
                         </VerticalStackLayout>
 
-                        <!-- RIGHT SIDE: Button -->
+                        <!-- New Round button -->
                         <Button
                             x:Name="NewRound"
                             Grid.Column="1"
@@ -55,6 +60,18 @@
                             TextColor="White"
                             CornerRadius="10"
                             Clicked="OnNewRoundClicked"
+                            HorizontalOptions="End"
+                            VerticalOptions="Center" />
+
+                        <!-- Progress button -->
+                        <Button
+                            x:Name="ViewProgress"
+                            Grid.Column="2"
+                            Text="View Progress"
+                            BackgroundColor="{StaticResource PrimaryGreen}"
+                            TextColor="White"
+                            CornerRadius="10"
+                            Clicked="OnViewProgressClicked"
                             HorizontalOptions="End"
                             VerticalOptions="Center" />
 
@@ -67,13 +84,14 @@
 
                         <!-- Total Rounds -->
                         <Border
+                            Grid.Column="0"
                             BackgroundColor="{StaticResource BackgroundWhite}"
                             StrokeThickness="0"
                             StrokeShape="RoundRectangle 20"
-                            Padding="25"
-                            Grid.Column="0">
+                            Padding="25">
 
                             <VerticalStackLayout Spacing="5">
+
                                 <Image
                                     Source="flag.png"
                                     HeightRequest="28"
@@ -82,25 +100,27 @@
 
                                 <Label
                                     x:Name="totalRounds"
-                                    TextColor="{StaticResource PrimaryGreen}"
-                                    FontSize="24" />
+                                    FontSize="24"
+                                    TextColor="{StaticResource PrimaryGreen}" />
 
                                 <Label
                                     Text="Total Rounds"
-                                    TextColor="{StaticResource TextMuted}"
-                                    FontSize="18" />
+                                    FontSize="18"
+                                    TextColor="{StaticResource TextMuted}" />
+
                             </VerticalStackLayout>
                         </Border>
 
                         <!-- Average Score -->
                         <Border
+                            Grid.Column="1"
                             BackgroundColor="{StaticResource BackgroundWhite}"
                             StrokeThickness="0"
                             StrokeShape="RoundRectangle 20"
-                            Padding="25"
-                            Grid.Column="1">
+                            Padding="25">
 
                             <VerticalStackLayout Spacing="5">
+
                                 <Image
                                     Source="improve_gold.png"
                                     HeightRequest="28"
@@ -109,25 +129,27 @@
 
                                 <Label
                                     x:Name="averageScore"
-                                    TextColor="{StaticResource PrimaryGreen}"
-                                    FontSize="24" />
+                                    FontSize="24"
+                                    TextColor="{StaticResource PrimaryGreen}" />
 
                                 <Label
                                     Text="Average Score"
-                                    TextColor="{StaticResource TextMuted}"
-                                    FontSize="18" />
+                                    FontSize="18"
+                                    TextColor="{StaticResource TextMuted}" />
+
                             </VerticalStackLayout>
                         </Border>
 
                         <!-- Best Score -->
                         <Border
+                            Grid.Column="2"
                             BackgroundColor="{StaticResource BackgroundWhite}"
                             StrokeThickness="0"
                             StrokeShape="RoundRectangle 20"
-                            Padding="25"
-                            Grid.Column="2">
+                            Padding="25">
 
                             <VerticalStackLayout Spacing="5">
+
                                 <Image
                                     Source="trophy.png"
                                     HeightRequest="28"
@@ -136,19 +158,20 @@
 
                                 <Label
                                     x:Name="best"
-                                    TextColor="{StaticResource PrimaryGreen}"
-                                    FontSize="24" />
+                                    FontSize="24"
+                                    TextColor="{StaticResource PrimaryGreen}" />
 
                                 <Label
                                     Text="Best Score"
-                                    TextColor="{StaticResource TextMuted}"
-                                    FontSize="18" />
+                                    FontSize="18"
+                                    TextColor="{StaticResource TextMuted}" />
+
                             </VerticalStackLayout>
                         </Border>
 
                     </Grid>
 
-                    <!-- Desktop previous rounds header -->
+                    <!-- Previous Rounds header -->
                     <Grid
                         ColumnDefinitions="*,Auto"
                         ColumnSpacing="15"
@@ -162,7 +185,7 @@
                             TextColor="{StaticResource PrimaryGreen}"
                             VerticalOptions="Center" />
 
-                        <!-- Styled desktop sorting dropdown -->
+                        <!-- Desktop sorting dropdown -->
                         <Border
                             Grid.Column="1"
                             BackgroundColor="{StaticResource BackgroundWhite}"
@@ -190,14 +213,15 @@
                                 </Picker.Items>
 
                             </Picker>
-
                         </Border>
 
                     </Grid>
 
                     <!-- Desktop previous rounds list -->
                     <CollectionView
-                        x:Name="DesktopRoundsList">
+                        x:Name="DesktopRoundsList"
+                        SelectionMode="Single"
+                        SelectionChanged="OnRoundSelected">
 
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
@@ -239,7 +263,6 @@
                                             VerticalOptions="Center" />
 
                                     </Grid>
-
                                 </Border>
 
                             </DataTemplate>
@@ -249,7 +272,10 @@
 
                 </VerticalStackLayout>
 
+                <!-- ==================================== -->
                 <!-- MOBILE HISTORY -->
+                <!-- ==================================== -->
+
                 <Grid
                     x:Name="MobileHistory"
                     RowDefinitions="Auto,Auto,Auto,Auto,*"
@@ -259,7 +285,9 @@
                     HorizontalOptions="Fill">
 
                     <!-- Mobile heading and statistics -->
-                    <VerticalStackLayout Spacing="5">
+                    <VerticalStackLayout
+                        Grid.Row="0"
+                        Spacing="8">
 
                         <Label
                             x:Name="HistoryTitleMobile"
@@ -283,20 +311,31 @@
                             HorizontalOptions="Fill"
                             HeightRequest="50" />
 
+                        <Button
+                            x:Name="ViewProgressMobile"
+                            Text="View Progress"
+                            BackgroundColor="{StaticResource PrimaryGreen}"
+                            TextColor="White"
+                            CornerRadius="10"
+                            Clicked="OnViewProgressClicked"
+                            HorizontalOptions="Fill"
+                            HeightRequest="50" />
+
                         <!-- Mobile statistics -->
                         <Grid
-                            RowDefinitions="*,*,*"
+                            RowDefinitions="Auto,Auto,Auto"
                             RowSpacing="20">
 
                             <!-- Total Rounds -->
                             <Border
+                                Grid.Row="0"
                                 BackgroundColor="{StaticResource BackgroundWhite}"
                                 StrokeThickness="0"
                                 StrokeShape="RoundRectangle 20"
-                                Padding="25"
-                                Grid.Row="0">
+                                Padding="25">
 
                                 <VerticalStackLayout Spacing="5">
+
                                     <Image
                                         Source="flag.png"
                                         HeightRequest="28"
@@ -305,25 +344,27 @@
 
                                     <Label
                                         x:Name="totalRoundsMobile"
-                                        TextColor="{StaticResource PrimaryGreen}"
-                                        FontSize="24" />
+                                        FontSize="24"
+                                        TextColor="{StaticResource PrimaryGreen}" />
 
                                     <Label
                                         Text="Total Rounds"
-                                        TextColor="{StaticResource TextMuted}"
-                                        FontSize="18" />
+                                        FontSize="18"
+                                        TextColor="{StaticResource TextMuted}" />
+
                                 </VerticalStackLayout>
                             </Border>
 
                             <!-- Average Score -->
                             <Border
+                                Grid.Row="1"
                                 BackgroundColor="{StaticResource BackgroundWhite}"
                                 StrokeThickness="0"
                                 StrokeShape="RoundRectangle 20"
-                                Padding="25"
-                                Grid.Row="1">
+                                Padding="25">
 
                                 <VerticalStackLayout Spacing="5">
+
                                     <Image
                                         Source="improve_gold.png"
                                         HeightRequest="28"
@@ -332,25 +373,27 @@
 
                                     <Label
                                         x:Name="averageScoreMobile"
-                                        TextColor="{StaticResource PrimaryGreen}"
-                                        FontSize="24" />
+                                        FontSize="24"
+                                        TextColor="{StaticResource PrimaryGreen}" />
 
                                     <Label
                                         Text="Average Score"
-                                        TextColor="{StaticResource TextMuted}"
-                                        FontSize="18" />
+                                        FontSize="18"
+                                        TextColor="{StaticResource TextMuted}" />
+
                                 </VerticalStackLayout>
                             </Border>
 
                             <!-- Best Score -->
                             <Border
+                                Grid.Row="2"
                                 BackgroundColor="{StaticResource BackgroundWhite}"
                                 StrokeThickness="0"
                                 StrokeShape="RoundRectangle 20"
-                                Padding="25"
-                                Grid.Row="2">
+                                Padding="25">
 
                                 <VerticalStackLayout Spacing="5">
+
                                     <Image
                                         Source="trophy.png"
                                         HeightRequest="28"
@@ -359,13 +402,14 @@
 
                                     <Label
                                         x:Name="bestMobile"
-                                        TextColor="{StaticResource PrimaryGreen}"
-                                        FontSize="24" />
+                                        FontSize="24"
+                                        TextColor="{StaticResource PrimaryGreen}" />
 
                                     <Label
                                         Text="Best Score"
-                                        TextColor="{StaticResource TextMuted}"
-                                        FontSize="18" />
+                                        FontSize="18"
+                                        TextColor="{StaticResource TextMuted}" />
+
                                 </VerticalStackLayout>
                             </Border>
 
@@ -373,11 +417,11 @@
 
                     </VerticalStackLayout>
 
-                    <!-- Mobile previous rounds header -->
+                    <!-- Mobile Previous Rounds heading -->
                     <Grid
                         Grid.Row="3"
                         ColumnDefinitions="*,Auto"
-                        ColumnSpacing="15"
+                        ColumnSpacing="10"
                         Padding="0,10">
 
                         <Label
@@ -388,7 +432,6 @@
                             TextColor="{StaticResource PrimaryGreen}"
                             VerticalOptions="Center" />
 
-                        <!-- Styled mobile sorting dropdown -->
                         <Border
                             Grid.Column="1"
                             BackgroundColor="{StaticResource BackgroundWhite}"
@@ -416,7 +459,6 @@
                                 </Picker.Items>
 
                             </Picker>
-
                         </Border>
 
                     </Grid>
@@ -424,7 +466,9 @@
                     <!-- Mobile previous rounds list -->
                     <CollectionView
                         Grid.Row="4"
-                        x:Name="MobileRoundsList">
+                        x:Name="MobileRoundsList"
+                        SelectionMode="Single"
+                        SelectionChanged="OnRoundSelected">
 
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
@@ -466,7 +510,6 @@
                                             VerticalOptions="Center" />
 
                                     </Grid>
-
                                 </Border>
 
                             </DataTemplate>
@@ -478,6 +521,345 @@
 
             </VerticalStackLayout>
         </ScrollView>
-    </Grid>
 
+        <!-- ==================================== -->
+        <!-- PROGRESS GRAPH POPUP -->
+        <!-- ZIndex 10: underneath Round Summary -->
+        <!-- ==================================== -->
+
+        <Grid
+            x:Name="ViewProgressOverlay"
+            Grid.RowSpan="2"
+            ZIndex="10"
+            IsVisible="False"
+            BackgroundColor="#99000000"
+            Padding="16">
+
+            <Border
+                MaximumWidthRequest="850"
+                MaximumHeightRequest="700"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                BackgroundColor="{StaticResource BackgroundWhite}"
+                StrokeThickness="0"
+                StrokeShape="RoundRectangle 24"
+                Padding="0">
+
+                <ScrollView>
+                    <VerticalStackLayout
+                        Padding="24"
+                        Spacing="20">
+
+                        <!-- Graph heading -->
+                        <VerticalStackLayout Spacing="5">
+
+                            <Label
+                                Text="Your Golf Progress"
+                                FontSize="28"
+                                FontAttributes="Bold"
+                                HorizontalTextAlignment="Center"
+                                TextColor="{StaticResource PrimaryGreen}" />
+
+                            <Label
+                                Text="Track how your golf game changes over time"
+                                FontSize="14"
+                                HorizontalTextAlignment="Center"
+                                TextColor="{StaticResource TextMuted}" />
+
+                        </VerticalStackLayout>
+
+                        <!-- Responsive filters -->
+                        <Grid
+                            x:Name="ProgressFiltersGrid"
+                            ColumnDefinitions="*,*,*"
+                            RowDefinitions="Auto"
+                            ColumnSpacing="12"
+                            RowSpacing="12"
+                            HorizontalOptions="Fill">
+
+                            <!-- Measurement filter -->
+                            <VerticalStackLayout
+                                x:Name="ProgressMetricFilter"
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Spacing="5">
+
+                                <Label
+                                    Text="Measurement"
+                                    FontAttributes="Bold"
+                                    TextColor="{StaticResource PrimaryGreen}" />
+
+                                <Border
+                                    BackgroundColor="{StaticResource BackgroundSoft}"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="8,0">
+
+                                    <Picker
+                                        x:Name="ProgressMetricPicker"
+                                        BackgroundColor="Transparent"
+                                        TextColor="{StaticResource TextDark}"
+                                        HeightRequest="45"
+                                        SelectedIndexChanged="OnProgressFiltersChanged">
+
+                                        <Picker.Items>
+                                            <x:String>Total Strokes</x:String>
+                                            <x:String>Relative to Par</x:String>
+                                            <x:String>Strokes per Hole</x:String>
+                                        </Picker.Items>
+
+                                    </Picker>
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <!-- Round Length filter -->
+                            <VerticalStackLayout
+                                x:Name="ProgressHolesFilter"
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Spacing="5">
+
+                                <Label
+                                    Text="Round Length"
+                                    FontAttributes="Bold"
+                                    TextColor="{StaticResource PrimaryGreen}" />
+
+                                <Border
+                                    BackgroundColor="{StaticResource BackgroundSoft}"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="8,0">
+
+                                    <Picker
+                                        x:Name="ProgressHolesPicker"
+                                        BackgroundColor="Transparent"
+                                        TextColor="{StaticResource TextDark}"
+                                        HeightRequest="45"
+                                        SelectedIndexChanged="OnProgressFiltersChanged">
+
+                                        <Picker.Items>
+                                            <x:String>All Round Lengths</x:String>
+                                            <x:String>9 Holes</x:String>
+                                            <x:String>18 Holes</x:String>
+                                        </Picker.Items>
+
+                                    </Picker>
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <!-- Time Range filter -->
+                            <VerticalStackLayout
+                                x:Name="ProgressTimeFilter"
+                                Grid.Row="0"
+                                Grid.Column="2"
+                                Spacing="5">
+
+                                <Label
+                                    Text="Time Range"
+                                    FontAttributes="Bold"
+                                    TextColor="{StaticResource PrimaryGreen}" />
+
+                                <Border
+                                    BackgroundColor="{StaticResource BackgroundSoft}"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="8,0">
+
+                                    <Picker
+                                        x:Name="ProgressTimePicker"
+                                        BackgroundColor="Transparent"
+                                        TextColor="{StaticResource TextDark}"
+                                        HeightRequest="45"
+                                        SelectedIndexChanged="OnProgressFiltersChanged">
+
+                                        <Picker.Items>
+                                            <x:String>All Rounds</x:String>
+                                            <x:String>Last 10 Rounds</x:String>
+                                        </Picker.Items>
+
+                                    </Picker>
+                                </Border>
+                            </VerticalStackLayout>
+
+                        </Grid>
+
+                        <!-- Chart -->
+                        <Border
+                            BackgroundColor="{StaticResource BackgroundWhite}"
+                            Stroke="#DFE8DE"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="12">
+
+                            <lvc:CartesianChart
+                                x:Name="ProgressChart"
+                                HeightRequest="300"
+                                BackgroundColor="White"
+                                HorizontalOptions="Fill"
+                                DataPointerDown="OnProgressPointClicked" />
+
+                        </Border>
+
+                        <!-- Empty state -->
+                        <Label
+                            x:Name="ProgressEmptyLabel"
+                            Text="No rounds match these filters."
+                            IsVisible="False"
+                            FontSize="14"
+                            HorizontalTextAlignment="Center"
+                            TextColor="{StaticResource TextMuted}" />
+
+                        <!-- Graph explanation -->
+                        <Label
+                            x:Name="ProgressDescriptionLabel"
+                            FontSize="13"
+                            HorizontalTextAlignment="Center"
+                            TextColor="{StaticResource TextMuted}" />
+
+                        <!-- Close graph -->
+                        <Button
+                            Text="Close Progress"
+                            BackgroundColor="{StaticResource PrimaryGreen}"
+                            TextColor="White"
+                            CornerRadius="12"
+                            Padding="14"
+                            Clicked="OnCloseProgressPopupClicked" />
+
+                    </VerticalStackLayout>
+                </ScrollView>
+
+            </Border>
+        </Grid>
+
+        <!-- ==================================== -->
+        <!-- ROUND SUMMARY POPUP -->
+        <!-- ZIndex 20: ABOVE the Progress Graph -->
+        <!-- ==================================== -->
+
+        <Grid
+            x:Name="HistoryRoundOverlay"
+            Grid.RowSpan="2"
+            ZIndex="20"
+            IsVisible="False"
+            BackgroundColor="#99000000"
+            Padding="16">
+
+            <Border
+                MaximumWidthRequest="460"
+                MaximumHeightRequest="650"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                BackgroundColor="{StaticResource BackgroundWhite}"
+                StrokeThickness="0"
+                StrokeShape="RoundRectangle 24"
+                Padding="0">
+
+                <ScrollView>
+                    <VerticalStackLayout
+                        Padding="24"
+                        Spacing="18">
+
+                        <Label
+                            Text="Round Summary"
+                            FontSize="28"
+                            FontAttributes="Bold"
+                            HorizontalTextAlignment="Center"
+                            TextColor="{StaticResource PrimaryGreen}" />
+
+                        <Label
+                            x:Name="HistoryPopupCourse"
+                            FontSize="20"
+                            FontAttributes="Bold"
+                            HorizontalTextAlignment="Center"
+                            TextColor="{StaticResource PrimaryGreen}" />
+
+                        <Label
+                            x:Name="HistoryPopupDetails"
+                            FontSize="14"
+                            HorizontalTextAlignment="Center"
+                            TextColor="{StaticResource TextMuted}" />
+
+                        <BoxView
+                            HeightRequest="1"
+                            Color="#DFE8DE" />
+
+                        <Grid
+                            ColumnDefinitions="*,*"
+                            ColumnSpacing="12">
+
+                            <!-- Total strokes -->
+                            <Border
+                                Grid.Column="0"
+                                BackgroundColor="{StaticResource BackgroundSoft}"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 14"
+                                Padding="12">
+
+                                <VerticalStackLayout Spacing="5">
+
+                                    <Label
+                                        Text="TOTAL STROKES"
+                                        FontSize="11"
+                                        HorizontalTextAlignment="Center"
+                                        TextColor="{StaticResource TextMuted}" />
+
+                                    <Label
+                                        x:Name="HistoryPopupStrokes"
+                                        FontSize="32"
+                                        FontAttributes="Bold"
+                                        HorizontalTextAlignment="Center"
+                                        TextColor="{StaticResource PrimaryGreen}" />
+
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Relative to par -->
+                            <Border
+                                Grid.Column="1"
+                                BackgroundColor="{StaticResource BackgroundSoft}"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 14"
+                                Padding="12">
+
+                                <VerticalStackLayout Spacing="5">
+
+                                    <Label
+                                        Text="RELATIVE TO PAR"
+                                        FontSize="11"
+                                        HorizontalTextAlignment="Center"
+                                        TextColor="{StaticResource TextMuted}" />
+
+                                    <Label
+                                        x:Name="HistoryPopupPar"
+                                        FontSize="32"
+                                        FontAttributes="Bold"
+                                        HorizontalTextAlignment="Center"
+                                        TextColor="{StaticResource PrimaryGreen}" />
+
+                                </VerticalStackLayout>
+                            </Border>
+
+                        </Grid>
+
+                        <Label
+                            x:Name="HistoryPopupHoles"
+                            FontSize="14"
+                            HorizontalTextAlignment="Center"
+                            TextColor="{StaticResource TextMuted}" />
+
+                        <Button
+                            Text="Close Summary"
+                            BackgroundColor="{StaticResource PrimaryGreen}"
+                            TextColor="White"
+                            CornerRadius="12"
+                            Padding="14"
+                            Clicked="OnCloseHistoryPopupClicked" />
+
+                    </VerticalStackLayout>
+                </ScrollView>
+
+            </Border>
+        </Grid>
+
+    </Grid>
 </ContentPage>

@@ -64,30 +64,53 @@
 
                             <VerticalStackLayout Spacing="20">
 
-                                <!-- Course name -->
-                                <VerticalStackLayout Spacing="5">
+                                
+                            <!-- Course name -->
+                            <VerticalStackLayout Spacing="5">
 
-                                    <Label
-                                        Text="Course Name"
-                                        TextColor="{StaticResource PrimaryGreen}"
-                                        FontAttributes="Bold" />
+                                <Label
+                                    Text="Course Name"
+                                    TextColor="{StaticResource PrimaryGreen}"
+                                    FontAttributes="Bold" />
 
-                                    <Border
-                                        BackgroundColor="{StaticResource BackgroundWhite}"
-                                        Stroke="#DFE8DE"
-                                        StrokeThickness="1"
-                                        StrokeShape="RoundRectangle 20">
+                                <!-- Previously played courses dropdown -->
+                                <Border
+                                    BackgroundColor="{StaticResource BackgroundWhite}"
+                                    Stroke="#DFE8DE"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 20"
+                                    Padding="10,0">
 
-                                        <Entry
-                                            x:Name="CourseNameEntry"
-                                            Placeholder="Oak Valley Golf Club"
-                                            TextColor="{StaticResource TextDark}"
-                                            PlaceholderColor="{StaticResource TextMuted}"
-                                            TextChanged="OnCourseNameChanged" />
+                                    <Picker
+                                        x:Name="CoursePicker"
+                                        BackgroundColor="Transparent"
+                                        TextColor="{StaticResource TextDark}"
+                                        HeightRequest="45"
+                                        SelectedIndexChanged="OnCourseSelectionChanged" />
 
-                                    </Border>
+                                </Border>
 
-                                </VerticalStackLayout>
+                                <!-- New course name entry -->
+                                <Border
+                                    x:Name="NewCourseBorder"
+                                    IsVisible="False"
+                                    BackgroundColor="{StaticResource BackgroundWhite}"
+                                    Stroke="#DFE8DE"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 20"
+                                    Padding="10,0">
+
+                                    <Entry
+                                        x:Name="CourseNameEntry"
+                                        Placeholder="Enter new course name"
+                                        TextColor="{StaticResource TextDark}"
+                                        PlaceholderColor="{StaticResource TextMuted}"
+                                        TextChanged="OnCourseNameChanged" />
+
+                                </Border>
+
+                            </VerticalStackLayout>
+
 
                                 <!-- Round date -->
                                 <VerticalStackLayout Spacing="5">
