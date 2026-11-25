@@ -1,4 +1,5 @@
-
+using GolfTracker.Data;
+using Microsoft.Extensions.DependencyInjection;
 namespace GolfTracker.Pages;
 
 public partial class NewGame : ContentPage
@@ -22,6 +23,11 @@ public partial class NewGame : ContentPage
     // Prevents TextChanged from firing logic
     // while restoring previously entered values
     private bool updatingParDisplay = false;
+
+    private const string AddNewCourseOption = "+ Add New Course";
+
+    private GolfDatabase Database =>
+        IPlatformApplication.Current!.Services.GetRequiredService<GolfDatabase>();
 
     public NewGame()
     {
@@ -174,12 +180,95 @@ public partial class NewGame : ContentPage
     // COURSE NAME VALIDATION
     // --------------------------------------------------
 
-    private void OnCourseNameChanged(
-        object sender,
-        TextChangedEventArgs e)
+    
+    private void OnCourseNameChanged(object sender, TextChangedEventArgs e)
     {
+        UpdateStartRoundButton();
+    }
+
+    private void UpdateStartRoundButton()
+    {
+        string courseName = GetSelectedCourseName();
+
         StartRoundButton.IsEnabled =
-            !string.IsNullOrWhiteSpace(e.NewTextValue);
+            !string.IsNullOrWhiteSpace(courseName);
+    }
+
+
+    private string GetSelectedCourseName()
+    {
+        string selectedCourse = CoursePicker.SelectedItem?.ToString() ?? "";
+
+        if (selectedCourse == AddNewCourseOption)
+        {
+            return CourseNameEntry.Text?.Trim() ?? "";
+        }
+
+        return selectedCourse;
+    }
+
+    private void OnCourseSelectionChanged(object? sender, EventArgs e)
+    {
+        bool addingNewCourse =
+            CoursePicker.SelectedItem?.ToString() == AddNewCourseOption;
+
+        NewCourseBorder.IsVisible = addingNewCourse;
+
+        UpdateStartRoundButton();
+    }
+
+
+    private async Task LoadPreviousCoursesAsync()
+    {
+        var rounds = await Database.GetRoundsAsync();
+
+        var courseNames = rounds
+            .Select(r => r.CourseName)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Select(name => name.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(name => name)
+            .ToList();
+
+        CoursePicker.Items.Clear();
+
+        foreach (string name in courseNames)
+        {
+            CoursePicker.Items.Add(name);
+        }
+
+        CoursePicker.Items.Add(AddNewCourseOption);
+
+        if (courseNames.Count == 0)
+        {
+            // No previous courses, so let the user enter one.
+            CoursePicker.SelectedItem = AddNewCourseOption;
+        }
+        else
+        {
+            CoursePicker.SelectedIndex = -1;
+        }
+
+        UpdateStartRoundButton();
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        try
+        {
+            await LoadPreviousCoursesAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(ex);
+
+            await DisplayAlertAsync(
+                "Course Loading Error",
+                "Previous courses could not be loaded.",
+                "OK");
+        }
     }
 
     // --------------------------------------------------
@@ -227,7 +316,7 @@ public partial class NewGame : ContentPage
         // Create the normal round parameters
         var parameters = new ShellNavigationQueryParameters
         {
-            { "CourseName", CourseNameEntry.Text },
+            { "CourseName", GetSelectedCourseName() },
             { "Date", RoundDatePicker.Date },
             { "CourseType", courseType },
             { "NumberOfHoles", numberOfHoles }
