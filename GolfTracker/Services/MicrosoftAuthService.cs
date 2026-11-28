@@ -1,4 +1,3 @@
-
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Extensions.Msal;
 
@@ -7,6 +6,9 @@ namespace GolfTracker.Services;
 public class MicrosoftAuthService
 {
     private const string ClientId = "6df57443-1a07-469f-a9f3-6674fe35b711";
+
+    // Remember which Microsoft account was selected.
+    private const string AccountIdKey = "MicrosoftAccountId";
 
     private static readonly string[] Scopes =
     {
@@ -50,55 +52,102 @@ public class MicrosoftAuthService
 #endif
     }
 
-    public async Task<AuthenticationResult> SignInAsync()
+    // Find the previously selected Microsoft account.
+    private static async Task<IAccount?> GetSavedAccountAsync()
+    {
+        string savedAccountId = Preferences.Default.Get(
+            AccountIdKey, string.Empty);
+
+        if (string.IsNullOrEmpty(savedAccountId))
+            return null;
+
+        var accounts = await _app.GetAccountsAsync();
+
+        return accounts.FirstOrDefault(account =>
+            account.HomeAccountId.Identifier == savedAccountId);
+    }
+
+    // Save an account only after the Sign In page accepts it.
+    public void SaveAccount(AuthenticationResult result)
+    {
+        Preferences.Default.Set(
+            AccountIdKey,
+            result.Account.HomeAccountId.Identifier);
+    }
+
+    public async Task<AuthenticationResult> SignInAsync(
+        CancellationToken cancellationToken = default,
+        bool useDifferentAccount = false)
     {
         // Ensure the persistent cache is ready first.
         await _cacheInitialization.Value;
+        cancellationToken.ThrowIfCancellationRequested();
 
-        var accounts = await _app.GetAccountsAsync();
+        // Find the previously selected account.
+        var savedAccount = await GetSavedAccountAsync();
+        cancellationToken.ThrowIfCancellationRequested();
 
-        try
+        // Skip silent sign-in when switching Microsoft accounts.
+        if (!useDifferentAccount && savedAccount != null)
         {
-            return await _app
-                .AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
-                .ExecuteAsync();
+            try
+            {
+                var silentResult = await _app
+                    .AcquireTokenSilent(Scopes, savedAccount)
+                    .ExecuteAsync(cancellationToken);
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                // The Sign In page will decide whether to save this account.
+                return silentResult;
+            }
+            catch (MsalUiRequiredException)
+            {
+                // Continue to device-code sign-in.
+            }
         }
-        catch (MsalUiRequiredException)
-        {
-            return await _app
-                .AcquireTokenWithDeviceCode(Scopes, deviceCodeResult =>
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var result = await _app
+            .AcquireTokenWithDeviceCode(Scopes, async deviceCodeResult =>
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
-                    MainThread.BeginInvokeOnMainThread(async () =>
-                    {
-                        await Shell.Current.DisplayAlertAsync(
-                            "Microsoft Sign In",
-                            deviceCodeResult.Message,
-                            "OK");
-                    });
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
 
-                    return Task.CompletedTask;
-                })
-                .ExecuteAsync();
-        }
+                    await Shell.Current.DisplayAlertAsync(
+                        "Microsoft Sign In",
+                        deviceCodeResult.Message,
+                        "OK");
+                });
+            })
+            .ExecuteAsync(cancellationToken);
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        // Return the account without saving it yet.
+        return result;
     }
 
-    // Check whether an existing Microsoft session can be restored.
+    // Check whether the saved Microsoft session can be restored.
     public async Task<bool> IsSignedInAsync()
     {
-        // Load the saved cache before checking accounts.
         await _cacheInitialization.Value;
 
-        var accounts = await _app.GetAccountsAsync();
+        var savedAccount = await GetSavedAccountAsync();
 
-        if (!accounts.Any())
-        {
+        // Never automatically select a different account.
+        if (savedAccount == null)
             return false;
-        }
 
         try
         {
             await _app
-                .AcquireTokenSilent(Scopes, accounts.First())
+                .AcquireTokenSilent(Scopes, savedAccount)
                 .ExecuteAsync();
 
             return true;
@@ -108,4 +157,12 @@ public class MicrosoftAuthService
             return false;
         }
     }
+
+    // Clear the selected account if needed.
+    public void ClearSelectedAccount()
+    {
+        Preferences.Default.Remove(AccountIdKey);
+    }
 }
+
+

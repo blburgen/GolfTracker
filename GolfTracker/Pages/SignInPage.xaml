@@ -33,7 +33,7 @@
 
                 <!-- Subtitle -->
                 <Label
-                    Text="Sign in with your Microsoft account to connect OneDrive and sync your golf scores across devices."
+                    Text="Sign in with your Microsoft account. OneDrive synchronization is not yet available."
                     FontSize="16"
                     TextColor="{StaticResource TextDark}"
                     HorizontalTextAlignment="Center" />
@@ -56,6 +56,15 @@
                     CornerRadius="10"
                     Clicked="OnMicrosoftSignInClicked" />
 
+                <!-- Switch Microsoft Account button -->
+                <Button
+                    Text="Use a different Microsoft account"
+                    BackgroundColor="Transparent"
+                    TextColor="{StaticResource PrimaryGreen}"
+                    FontSize="14"
+                    HeightRequest="45"
+                    Clicked="OnSwitchMicrosoftAccountClicked" />
+
                 <!-- Guest Mode button -->
                 <Button
                     Text="Continue without signing in"
@@ -67,7 +76,7 @@
 
                 <!-- Guest mode explanation -->
                 <Label
-                    Text="You can track your golf games without signing in. OneDrive synchronization will be unavailable in guest mode."
+                    Text="You can track your golf games without signing in. OneDrive synchronization is not yet available."
                     FontSize="13"
                     TextColor="{StaticResource TextDark}"
                     HorizontalTextAlignment="Center" />
