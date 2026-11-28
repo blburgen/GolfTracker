@@ -1,4 +1,3 @@
-
 namespace GolfTracker.Pages;
 
 public partial class History : ContentPage
